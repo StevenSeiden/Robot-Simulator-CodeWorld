@@ -11,25 +11,32 @@
 
 
 
-exercise = 0 -- Change it to another number to test the corresponding exercise
+exercise = 4 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
 -------------------------------------------------------------------------------
 
-pause = undefined -- replace undefined with the correct definition
+pause = (0,0)
+-- replace undefined with the correct definition
 
 -------------------------------------------------------------------------------
 -- Exercise 2: Add a parameter to make the simulation run faster or slower
 -------------------------------------------------------------------------------
 
-simulation_speed = 1 -- Change this number for testing exercise 2
+simulation_speed = 10 -- Change this number for testing exercise 2
 
 -------------------------------------------------------------------------------
 -- Exercise 3: Make the robot visit all the cells in the board
 -------------------------------------------------------------------------------
 
-robot_plan_ex3 = [] -- write your plan here
+robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
+  where
+  visit_all_left(num) = repeated([left], num) ++ [down]
+  visit_all_right(num) = repeated([right], num) ++ [down]
+  
+
+
 
 -------------------------------------------------------------------------------
 -- Exercise 4: Repeat exercise 4 using a different plan for the robot movement
@@ -37,7 +44,18 @@ robot_plan_ex3 = [] -- write your plan here
 --                   as new plans
 -------------------------------------------------------------------------------
 
-robot_plan_ex4 = [] -- write your plan here
+robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
+                ++ right_down(8) ++ left_up(7)
+                ++ right_down(6) ++ left_up(5)
+                ++ right_down(4) ++ left_up(3)
+                ++ right_down(2) ++ visit_all_left(1)
+  where
+  visit_all_left(num) = repeated([left], num)
+  visit_all_right(num) = repeated([right], num)
+  visit_all_up(num) = repeated([up], num)
+  visit_all_down(num) = repeated([down], num)
+  right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
+  left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1))
 
 -------------------------------------------------------------------------------
 -- Exercise 5: Make everything work in a board of arbitrary size
@@ -100,7 +118,7 @@ smooth = False -- Use this parameter to control smoothness
 update((t,i,j,[],n,hs),dt) = (t+dt,i,j,[],n,hs)
 
 update(         (t   , i   , j   , cmds , n  ,         hs),dt) =
-  if t < 1 then (t+dt, i   , j   , cmds , n  ,         hs)
+  if t*simulation_speed < 1 then (t+dt, i   , j   , cmds , n  ,         hs)
            else (0   , i+ci, j+cj, cmds', n+1, (n,i,j):hs)
   
   where
@@ -137,8 +155,9 @@ draw_crumbs(cells,x0,x1,y0,y1,hs) =
 -- exercise = 1 at the beginning of the file.
 
 robot_plan_ex0 =
-  [right,right,right,down,down,down,left,up,left,up,left,up]
-
+  --[right,right,right,down,down,down,left,up,left,up,left,up]
+  [right,right,right,right,right,right,right,right,right,down,down,left,up]
+  
 robot_plan_ex1 =
   [right,right,right,pause,down,down,pause,pause,down,left,up,left,up,left]
       
