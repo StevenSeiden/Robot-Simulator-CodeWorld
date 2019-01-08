@@ -11,7 +11,7 @@
 
 
 
-exercise = 4 -- Change it to another number to test the corresponding exercise
+exercise = 5 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -44,11 +44,7 @@ robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
 --                   as new plans
 -------------------------------------------------------------------------------
 
-robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
-                ++ right_down(8) ++ left_up(7)
-                ++ right_down(6) ++ left_up(5)
-                ++ right_down(4) ++ left_up(3)
-                ++ right_down(2) ++ visit_all_left(1)
+robot_plan_ex4 = cover_all(10)
   where
   visit_all_left(num) = repeated([left], num)
   visit_all_right(num) = repeated([right], num)
@@ -56,6 +52,11 @@ robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
   visit_all_down(num) = repeated([down], num)
   right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
   left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1))
+  cover_all(num) = visit_all_right(num-1) ++ visit_all_down(num-1) ++ left_up(num-1)
+                 ++ right_down(num-2) ++ left_up(num-3)
+                 ++ right_down(num-4) ++ left_up(num-5)
+                 ++ right_down(num-6) ++ left_up(num-7)
+                 ++ right_down(num-8) ++ visit_all_left(num-9)
 
 -------------------------------------------------------------------------------
 -- Exercise 5: Make everything work in a board of arbitrary size
@@ -65,7 +66,7 @@ robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
 --             Also, change your plan3 and plan4 to depend on numCells
 -------------------------------------------------------------------------------
 
-numCells = 10 -- When you change this number, everything should still work
+numCells = 20 -- When you change this number, everything should still work
 
 -------------------------------------------------------------------------------
 -- Exercise 6: Make the robot move smoothly instead of jumping
