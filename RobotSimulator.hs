@@ -1,3 +1,4 @@
+import Extras((<$>))
 
 -------------------------------------------------------------------------------
 -- Before proceeding, read all the comments below and pay attention to them
@@ -33,7 +34,8 @@ simulation_speed = 10 -- Change this number for testing exercise 2
 robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
   where
   visit_all_left(num) = repeated([left], num) ++ [down]
-  visit_all_right(num) = repeated([right], num) ++ [down]
+  visit_all_right(num) = repeated([right], num) ++ [down] 
+ 
   
 
 
@@ -44,7 +46,31 @@ robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
 --                   as new plans
 -------------------------------------------------------------------------------
 
-robot_plan_ex4 = cover_all(10)
+robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
+                ++ right_down(8) ++ left_up(7)
+                ++ right_down(6) ++ left_up(5)
+                ++ right_down(4) ++ left_up(3)
+                ++ right_down(2) ++ visit_all_left(1)
+  where
+  visit_all_left(num) = repeated([left], num)
+  visit_all_right(num) = repeated([right], num)
+  visit_all_up(num) = repeated([up], num)
+  visit_all_down(num) = repeated([down], num)
+  right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
+  left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1)) 
+
+
+-------------------------------------------------------------------------------
+-- Exercise 5: Make everything work in a board of arbitrary size
+--             The board needs to be fit to the size of the output
+--             Do not have parts of the board outside the window
+--             Test it with 7 cells and with 11 cells
+--             Also, change your plan3 and plan4 to depend on numCells
+-------------------------------------------------------------------------------
+
+numCells = 11 -- When you change this number, everything should still work
+
+robot_plan_ex5 = cover_all(numCells)
   where
   visit_all_left(num) = repeated([left], num)
   visit_all_right(num) = repeated([right], num)
@@ -57,17 +83,7 @@ robot_plan_ex4 = cover_all(10)
                  ++ right_down(num-4) ++ left_up(num-5)
                  ++ right_down(num-6) ++ left_up(num-7)
                  ++ right_down(num-8) ++ visit_all_left(num-9)
-
--------------------------------------------------------------------------------
--- Exercise 5: Make everything work in a board of arbitrary size
---             The board needs to be fit to the size of the output
---             Do not have parts of the board outside the window
---             Test it with 7 cells and with 11 cells
---             Also, change your plan3 and plan4 to depend on numCells
--------------------------------------------------------------------------------
-
-numCells = 20 -- When you change this number, everything should still work
-
+  
 -------------------------------------------------------------------------------
 -- Exercise 6: Make the robot move smoothly instead of jumping
 -------------------------------------------------------------------------------
@@ -128,11 +144,11 @@ update(         (t   , i   , j   , cmds , n  ,         hs),dt) =
 
 
 draw(t,i,j,cmds,n,hs) =
-  placedInBoard(cells,x0,x1,y0,y1,robot,i,j)
-  & draw_crumbs(cells,x0,x1,y0,y1,hs)
-  & checkerboard(cells,x0,x1,y0,y1)
+   scaled(placedInBoard(cells,x0,x1,y0,y1,robot,i,j),10/numCells,10/numCells)
+  & scaled(draw_crumbs(cells,x0,x1,y0,y1,hs),10/numCells,10/numCells)
+  & scaled(checkerboard(cells,x0,x1,y0,y1),10/numCells,10/numCells)
   where
-    (cells,x0,x1,y0,y1) = (10,-10,10,10,-10)
+    (cells,x0,x1,y0,y1) = (numCells,-(numCells),numCells,numCells,-(numCells))
 
 draw_crumbs(cells,x0,x1,y0,y1,hs) =
   pictures([txt(n,midpoint(x0,w,j),midpoint(y0,h,i))
@@ -177,6 +193,7 @@ initial(_) = (0,1,1,cmds(exercise),1,[])
     cmds(1)     = robot_plan_ex1
     cmds(3)     = robot_plan_ex3
     cmds(4)     = robot_plan_ex4
+    cmds(5)     = robot_plan_ex5
     cmds(other) = robot_plan_ex0  -- plan 0 is provided as an example
     
 
