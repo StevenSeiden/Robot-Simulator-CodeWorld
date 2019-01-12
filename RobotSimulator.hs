@@ -78,8 +78,9 @@ robot_plan_ex5 = cover_all(numCells)
   visit_all_down(num) = repeated([down], num)
   right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
   left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1))
-  cover_all(num) = visit_all_right(num-1) ++ visit_all_down(num-1) ++ left_up(num-1)
-                 ++ iterateNums((numCells-2))
+  cover_all(num) = if num == 1 then [pause] else
+		visit_all_right(num-1) ++ visit_all_down(num-1)
+		++ left_up(num-1) ++ iterateNums((numCells-2))
      where
      iterateNums :: Number -> [(Number,Number)]
      iterateNums(runAmount) =
