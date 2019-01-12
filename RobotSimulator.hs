@@ -79,10 +79,17 @@ robot_plan_ex5 = cover_all(numCells)
   right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
   left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1))
   cover_all(num) = visit_all_right(num-1) ++ visit_all_down(num-1) ++ left_up(num-1)
-                 ++ right_down(num-2) ++ left_up(num-3)
-                 ++ right_down(num-4) ++ left_up(num-5)
-                 ++ right_down(num-6) ++ left_up(num-7)
-                 ++ right_down(num-8) ++ visit_all_left(num-9)
+                 ++ iterateNums((numCells-2))
+     where
+     iterateNums :: Number -> [(Number,Number)]
+     iterateNums(runAmount) =
+     	if runAmount <= 2 then
+     		if runAmount == 1 then [right]
+     		else if runAmount == 2 then [right, right, down, left]
+     		else [pause]
+     	else right_down(runAmount) ++
+     	left_up(runAmount-1) ++ iterateNums(runAmount-2)
+
   
 -------------------------------------------------------------------------------
 -- Exercise 6: Make the robot move smoothly instead of jumping
