@@ -9,5 +9,5 @@ Requirements:
 - curl
 
 ```bash
-$ codeworld_upload.sh -s RobotSimulator.hs
+$ ./codeworld_upload.sh -s RobotSimulator.hs
 ```
