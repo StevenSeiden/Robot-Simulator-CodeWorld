@@ -12,7 +12,7 @@ import Extras((<$>))
 
 
 
-exercise = 5 -- Change it to another number to test the corresponding exercise
+exercise = 4 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -46,10 +46,7 @@ robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
 --                   as new plans
 -------------------------------------------------------------------------------
 
-robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
-                ++ right_down(8) ++ left_up(7)
-                ++ right_down(6) ++ left_up(5)
-                ++ right_down(4) ++ left_up(3)
+robot_plan_ex4 = iterateNums((numCells))
                 ++ right_down(2) ++ visit_all_left(1)
   where
   visit_all_left(num) = repeated([left], num)
@@ -58,8 +55,12 @@ robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
   visit_all_down(num) = repeated([down], num)
   right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
   left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1)) 
-
-
+  iterateNums :: Number -> [(Number,Number)]
+  iterateNums(runAmount) =
+     if runAmount <= 2 then
+         if runAmount == 1 then [right]
+         else [pause]
+     else right_down(runAmount)++ left_up(runAmount-1) ++ iterateNums(runAmount-2)
 -------------------------------------------------------------------------------
 -- Exercise 5: Make everything work in a board of arbitrary size
 --             The board needs to be fit to the size of the output
@@ -68,7 +69,7 @@ robot_plan_ex4 = visit_all_right(9) ++ visit_all_down(9) ++ left_up(9)
 --             Also, change your plan3 and plan4 to depend on numCells
 -------------------------------------------------------------------------------
 
-numCells = 11 -- When you change this number, everything should still work
+numCells = 13 -- When you change this number, everything should still work
 
 robot_plan_ex5 = cover_all(numCells)
   where
