@@ -247,4 +247,3 @@ robot =
           & solidRectangle(0.6,0.6),red)
   & translated(solidCircle(0.1),-0.2,-0.45)
   & translated(solidCircle(0.1),0.2,-0.45)
-
