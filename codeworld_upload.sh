@@ -63,5 +63,6 @@ for file in "$@"; do
         echo "Source at: $curl"
         firefox $curl
         echo
+        exit 1
     fi
 done

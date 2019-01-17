@@ -1,0 +1,8 @@
+language: bash
+addons:
+  apt:
+    packages:
+      - jq
+      - curl
+script:
+      - bash ./codeworld_upload.sh -s RobotSimulator.hs
