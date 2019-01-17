@@ -25,7 +25,7 @@ pause = (0,0)
 -- Exercise 2: Add a parameter to make the simulation run faster or slower
 -------------------------------------------------------------------------------
 
-simulation_speed = 30 -- Change this number for testing exercise 2
+simulation_speed = 1 -- Change this number for testing exercise 2
 
 -------------------------------------------------------------------------------
 -- Exercise 3: Make the robot visit all the cells in the board
@@ -34,11 +34,7 @@ simulation_speed = 30 -- Change this number for testing exercise 2
 robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
   where
   visit_all_left(num) = repeated([left], num) ++ [down]
-  visit_all_right(num) = repeated([right], num) ++ [down] 
- 
-  
-
-
+  visit_all_right(num) = repeated([right], num) ++ [down]
 
 -------------------------------------------------------------------------------
 -- Exercise 4: Repeat exercise 4 using a different plan for the robot movement
@@ -46,7 +42,7 @@ robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
 --                   as new plans
 -------------------------------------------------------------------------------
 robot_plan_ex4 = iterateNums((numCells-1))
-				
+
               --  ++ right_down(2) ++ visit_all_left(1)
   where
   visit_all_left(num) = repeated([left], num)
@@ -141,9 +137,9 @@ smooth = False -- Use this parameter to control smoothness
 
 update((t,i,j,[],n,hs),dt) = (t+dt,i,j,[],n,hs)
 
-update(         (t   , i   , j   , cmds , n  ,         hs),dt) =
-  if t*simulation_speed < 1 then (t+dt, i   , j   , cmds , n  ,         hs)
-           else (0   , i+ci, j+cj, cmds', n+1, (n,i,j):hs)
+update((t, i, j, cmds, n, hs), dt) =
+  if t*simulation_speed < 1 then (t+dt, i, j, cmds, n, hs)
+  else (0, i+ci, j+cj, cmds', n+1, (n,i,j):hs)
   
   where
     (ci,cj) = cmds#1
@@ -151,10 +147,12 @@ update(         (t   , i   , j   , cmds , n  ,         hs),dt) =
 
 
 draw(t,i,j,cmds,n,hs) =
-   scaled(placedInBoard(cells,x0,x1,y0,y1,robot,i,j),10/numCells,10/numCells)
+  scaled(placedInBoard(cells,x0,x1,y0,y1,robot,i+ci*t,j+cj*t),10/numCells,10/numCells)
   & scaled(draw_crumbs(cells,x0,x1,y0,y1,hs),10/numCells,10/numCells)
   & scaled(checkerboard(cells,x0,x1,y0,y1),10/numCells,10/numCells)
   where
+    (ci,cj) = cmds#1
+
     (cells,x0,x1,y0,y1) = (numCells,-(numCells),numCells,numCells,-(numCells))
 
 draw_crumbs(cells,x0,x1,y0,y1,hs) =
