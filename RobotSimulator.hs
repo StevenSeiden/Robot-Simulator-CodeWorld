@@ -134,13 +134,18 @@ smooth = False -- Use this parameter to control smoothness
 -------------------------------------------------------------------------------
 -- Modify update and draw to comply with the requirements above
 -------------------------------------------------------------------------------
-
+-- t - time
+-- i - row position
+-- j - column position
+-- cmds - commands 
+-- n - step #
+-- hs - list of crumbs and position
+-- crumb - (n,i,j)
 update((t,i,j,[],n,hs),dt) = (t+dt,i,j,[],n,hs)
 
 update((t, i, j, cmds, n, hs), dt) =
   if t*simulation_speed < 1 then (t+dt, i, j, cmds, n, hs)
-  else (0, i+ci, j+cj, cmds', n+1, (n,i,j):hs)
-  
+  else (0, i+ci, j+cj, cmds', n+1, (n+1,i+ci,j+cj):hs)
   where
     (ci,cj) = cmds#1
     cmds' = rest(cmds,1)
@@ -193,8 +198,9 @@ up = (-1,0)
 left = (0,-1)
 right = (0,1)
 
-initial(_) = (0,1,1,cmds(exercise),1,[])
+initial(_) = (0,1,1,cmds(exercise),1,[firstCrumb])
   where
+    firstCrumb = (1,1,1)
     cmds(1)     = robot_plan_ex1
     cmds(3)     = robot_plan_ex3
     cmds(4)     = robot_plan_ex4
