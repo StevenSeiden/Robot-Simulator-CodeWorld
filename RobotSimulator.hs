@@ -91,7 +91,7 @@ robot_plan_ex5 = cover_all(numCells)
 -- Exercise 6: Make the robot move smoothly instead of jumping
 -------------------------------------------------------------------------------
 
-smooth = False -- Use this parameter to control smoothness
+smooth = True -- Use this parameter to control smoothness
 
 -------------------------------------------------------------------------------
 -- Exercise 7: Draw a line along the path that the robot moves, so that
@@ -152,12 +152,13 @@ update((t, i, j, cmds, n, hs), dt) =
 
 
 draw(t,i,j,cmds,n,hs) =
-  scaled(placedInBoard(cells,x0,x1,y0,y1,robot,i+ci*t,j+cj*t),10/numCells,10/numCells)
+  scaled(placedInBoard(cells,x0,x1,y0,y1,robot,newI,newJ),10/numCells,10/numCells)
   & scaled(draw_crumbs(cells,x0,x1,y0,y1,hs),10/numCells,10/numCells)
   & scaled(checkerboard(cells,x0,x1,y0,y1),10/numCells,10/numCells)
   where
     (ci,cj) = cmds#1
-
+    newI = if smooth then i+ci*t else i
+    newJ = if smooth then j+cj*t else j
     (cells,x0,x1,y0,y1) = (numCells,-(numCells),numCells,numCells,-(numCells))
 
 draw_crumbs(cells,x0,x1,y0,y1,hs) =
