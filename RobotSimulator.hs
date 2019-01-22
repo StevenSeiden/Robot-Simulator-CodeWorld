@@ -98,6 +98,8 @@ smooth = True -- Use this parameter to control smoothness
 --             it is easy to see the trayectory it follows
 -------------------------------------------------------------------------------
 
+robotPath = False
+
 -------------------------------------------------------------------------------
 -- Exercise 8: Add a plan, like in Exercise 4, so that the robot can start 
 --             at any random position and still cover all the cells
@@ -161,9 +163,10 @@ draw(t,i,j,cmds,n,hs) =
     newJ = if smooth then j+cj*t else j
     (cells,x0,x1,y0,y1) = (numCells,-(numCells),numCells,numCells,-(numCells))
 
-draw_crumbs(cells,x0,x1,y0,y1,hs) =
+draw_crumbs(cells,x0,x1,y0,y1,hs) = if robotPath then 
   pictures([txt(n,midpoint(x0,w,j),midpoint(y0,h,i))
            | (n,i,j) <- hs ])
+  else polyline[(midpoint(x0,w,j),midpoint(y0,h,i))| (n,i,j) <- hs]
   where
     txt(n,x,y) = translated(scaled(text(printed(n)),0.5,0.5),x,y)
     w = (x1-x0)/cells
