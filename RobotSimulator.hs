@@ -164,9 +164,9 @@ draw(t,i,j,cmds,n,hs) =
     (cells,x0,x1,y0,y1) = (numCells,-(numCells),numCells,numCells,-(numCells))
 
 draw_crumbs(cells,x0,x1,y0,y1,hs) = if robotPath then 
-  pictures([txt(n,midpoint(x0,w,j),midpoint(y0,h,i))
+  polyline[(midpoint(x0,w,j),midpoint(y0,h,i))| (n,i,j) <- hs]
+  else pictures([txt(n,midpoint(x0,w,j),midpoint(y0,h,i))
            | (n,i,j) <- hs ])
-  else polyline[(midpoint(x0,w,j),midpoint(y0,h,i))| (n,i,j) <- hs]
   where
     txt(n,x,y) = translated(scaled(text(printed(n)),0.5,0.5),x,y)
     w = (x1-x0)/cells
