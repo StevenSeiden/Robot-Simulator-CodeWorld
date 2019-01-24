@@ -12,7 +12,7 @@ import Extras((<$>))
 
 
 
-exercise = 4 -- Change it to another number to test the corresponding exercise
+exercise = 8 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -25,7 +25,7 @@ pause = (0,0)
 -- Exercise 2: Add a parameter to make the simulation run faster or slower
 -------------------------------------------------------------------------------
 
-simulation_speed = 1 -- Change this number for testing exercise 2
+simulation_speed = 3 -- Change this number for testing exercise 2
 
 -------------------------------------------------------------------------------
 -- Exercise 3: Make the robot visit all the cells in the board
@@ -91,7 +91,7 @@ robot_plan_ex5 = cover_all(numCells)
 -- Exercise 6: Make the robot move smoothly instead of jumping
 -------------------------------------------------------------------------------
 
-smooth = True -- Use this parameter to control smoothness
+smooth = False -- Use this parameter to control smoothness
 
 -------------------------------------------------------------------------------
 -- Exercise 7: Draw a line along the path that the robot moves, so that
@@ -105,6 +105,15 @@ robotPath = True
 --             at any random position and still cover all the cells
 --             You may need to modify the state to account for randomness
 -------------------------------------------------------------------------------
+
+startX = 3
+startY = 2
+
+robot_plan_ex8 = repeated([up], startX-1) ++ repeated([left], startY-1)
+  ++repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
+  where
+  visit_all_left(num) = repeated([left], num) ++ [down]
+  visit_all_right(num) = repeated([right], num) ++ [down]
 
 -------------------------------------------------------------------------------
 -- Exercise 9: Make the robot move like a chess knight and then plan a path
@@ -172,19 +181,6 @@ draw_crumbs(cells,x0,x1,y0,y1,hs,newI,newJ) = if robotPath then
     w = (x1-x0)/cells
     h = (y1-y0)/cells
 
--------------------------------------------------------------------------------
--- For Exercises 1 to 6 (included):
--- DO NOT MODIFY ANYTHING BELOW THIS LINE (But read the code)
-
--- For Exercises 7 to 12 (included):
--- You may modify any part of the code, but you need to submit 
--- your solutions to Exercises 1 to 6 before you change the code below
--------------------------------------------------------------------------------
-
--- Do not modify the robot plans here. Once you define
--- the pause command, you can test exercise 1 by setting
--- exercise = 1 at the beginning of the file.
-
 robot_plan_ex0 =
   --[right,right,right,down,down,down,left,up,left,up,left,up]
   [right,right,right,right,right,right,right,right,right,down,down,left,up]
@@ -202,13 +198,14 @@ up = (-1,0)
 left = (0,-1)
 right = (0,1)
 
-initial(_) = (0,1,1,cmds(exercise),1,[firstCrumb])
+initial(_) = (0,startX,startY,cmds(exercise),1,[firstCrumb])
   where
-    firstCrumb = (1,1,1)
+    firstCrumb = (1,startX,startY)
     cmds(1)     = robot_plan_ex1
     cmds(3)     = robot_plan_ex3
     cmds(4)     = robot_plan_ex4
     cmds(5)     = robot_plan_ex5
+    cmds(8)     = robot_plan_ex8
     cmds(other) = robot_plan_ex0  -- plan 0 is provided as an example
     
 
