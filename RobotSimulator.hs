@@ -74,17 +74,17 @@ robot_plan_ex5 = cover_all(numCells)
   right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
   left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1))
   cover_all(num) = if num == 1 then [pause] else
-		visit_all_right(num-1) ++ visit_all_down(num-1)
-		++ left_up(num-1) ++ iterateNums((numCells-2))
+    visit_all_right(num-1) ++ visit_all_down(num-1)
+    ++ left_up(num-1) ++ iterateNums((numCells-2))
      where
      iterateNums :: Number -> [(Number,Number)]
      iterateNums(runAmount) =
-     	if runAmount <= 2 then
-     		if runAmount == 1 then [right]
-     		else if runAmount == 2 then [right, right, down, left]
-     		else [pause]
-     	else right_down(runAmount) ++
-     	left_up(runAmount-1) ++ iterateNums(runAmount-2)
+       if runAmount <= 2 then
+       if runAmount == 1 then [right]
+       else if runAmount == 2 then [right, right, down, left]
+       else [pause]
+     else right_down(runAmount) ++
+       left_up(runAmount-1) ++ iterateNums(runAmount-2)
 
   
 -------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ smooth = True -- Use this parameter to control smoothness
 --             it is easy to see the trayectory it follows
 -------------------------------------------------------------------------------
 
-robotPath = False
+robotPath = True
 
 -------------------------------------------------------------------------------
 -- Exercise 8: Add a plan, like in Exercise 4, so that the robot can start 
