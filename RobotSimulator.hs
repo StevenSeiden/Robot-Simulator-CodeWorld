@@ -155,7 +155,7 @@ update((t, i, j, cmds, n, hs), dt) =
 
 draw(t,i,j,cmds,n,hs) =
   scaled(placedInBoard(cells,x0,x1,y0,y1,robot,newI,newJ),10/numCells,10/numCells)
-  & scaled(draw_crumbs(cells,x0,x1,y0,y1,hs),10/numCells,10/numCells)
+  & scaled(draw_crumbs(cells,x0,x1,y0,y1,hs,newI,newJ),10/numCells,10/numCells)
   & scaled(checkerboard(cells,x0,x1,y0,y1),10/numCells,10/numCells)
   where
     (ci,cj) = cmds#1
@@ -163,8 +163,8 @@ draw(t,i,j,cmds,n,hs) =
     newJ = if smooth then j+cj*t else j
     (cells,x0,x1,y0,y1) = (numCells,-(numCells),numCells,numCells,-(numCells))
 
-draw_crumbs(cells,x0,x1,y0,y1,hs) = if robotPath then 
-  polyline[(midpoint(x0,w,j),midpoint(y0,h,i))| (n,i,j) <- hs]
+draw_crumbs(cells,x0,x1,y0,y1,hs,newI,newJ) = if robotPath then
+  polyline[(midpoint(x0,w,j),midpoint(y0,h,i))| (n,i,j) <- (0,newI,newJ):hs]
   else pictures([txt(n,midpoint(x0,w,j),midpoint(y0,h,i))
            | (n,i,j) <- hs ])
   where
