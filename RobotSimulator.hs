@@ -12,7 +12,7 @@ import Extras((<$>))
 
 
 
-exercise = 8 -- Change it to another number to test the corresponding exercise
+exercise = 0 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -98,7 +98,7 @@ smooth = False -- Use this parameter to control smoothness
 --             it is easy to see the trayectory it follows
 -------------------------------------------------------------------------------
 
-robotPath = True
+robotPath = False
 
 -------------------------------------------------------------------------------
 -- Exercise 8: Add a plan, like in Exercise 4, so that the robot can start 
@@ -183,8 +183,7 @@ draw_crumbs(cells,x0,x1,y0,y1,hs,newI,newJ) = if robotPath then
     h = (y1-y0)/cells
 
 robot_plan_ex0 =
-  --[right,right,right,down,down,down,left,up,left,up,left,up]
-  [right,right,right,right,right,right,right,right,right,down,down,left,up]
+  repeated([right],9) ++ [down,down,left,up]
   
 robot_plan_ex1 =
   [right,right,right,pause,down,down,pause,pause,down,left,up,left,up,left]
@@ -199,7 +198,16 @@ up = (-1,0)
 left = (0,-1)
 right = (0,1)
 
-initial(random) = (0,startX(random),startY(random),cmds(exercise),1,[firstCrumb])
+knight(1) = (2,1)
+knight(2) = (2,-1)
+knight(3) = (-2,1)
+knight(4) = (-2,-1)
+knight(5) = (1,2)
+knight(6) = (1,-2)
+knight(7) = (-1,2)
+knight(8) = (-1,-2)
+
+initial(random) = (0,3,3,cmds(exercise),1,[firstCrumb])
   where
     firstCrumb = (1,startX(random),startY(random))
     cmds(1)     = robot_plan_ex1
