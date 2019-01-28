@@ -106,14 +106,15 @@ robotPath = True
 --             You may need to modify the state to account for randomness
 -------------------------------------------------------------------------------
 
-startX = 3
-startY = 2
+startX(random) = truncation(1 + random#1 * numCells)
+startY(random) = truncation(1 + random#2 * numCells)
 
-robot_plan_ex8 = repeated([up], startX-1) ++ repeated([left], startY-1)
+robot_plan_ex8(random) = repeated([up], startX(random)-1) ++ repeated([left], startY(random)-1)
   ++repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
   where
   visit_all_left(num) = repeated([left], num) ++ [down]
   visit_all_right(num) = repeated([right], num) ++ [down]
+
 
 -------------------------------------------------------------------------------
 -- Exercise 9: Make the robot move like a chess knight and then plan a path
@@ -198,15 +199,16 @@ up = (-1,0)
 left = (0,-1)
 right = (0,1)
 
-initial(_) = (0,startX,startY,cmds(exercise),1,[firstCrumb])
+initial(random) = (0,startX(random),startY(random),cmds(exercise),1,[firstCrumb])
   where
-    firstCrumb = (1,startX,startY)
+    firstCrumb = (1,startX(random),startY(random))
     cmds(1)     = robot_plan_ex1
     cmds(3)     = robot_plan_ex3
     cmds(4)     = robot_plan_ex4
     cmds(5)     = robot_plan_ex5
-    cmds(8)     = robot_plan_ex8
+    cmds(8)     = robot_plan_ex8(random)
     cmds(other) = robot_plan_ex0  -- plan 0 is provided as an example
+
     
 
 {-| placedInBoard(n,x0,x1,y0,y1,pic,i,j) is a picture standing at cell (i,j)
