@@ -12,7 +12,7 @@ import Extras((<$>))
 
 
 
-exercise = 0 -- Change it to another number to test the corresponding exercise
+exercise = 8 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -106,8 +106,8 @@ robotPath = False
 --             You may need to modify the state to account for randomness
 -------------------------------------------------------------------------------
 
-startX(random) = truncation(1 + random#1 * numCells)
-startY(random) = truncation(1 + random#2 * numCells)
+startX(random) = 3 --truncation(1 + random#1 * numCells)
+startY(random) = 3 --truncation(1 + random#2 * numCells)
 
 robot_plan_ex8(random) = repeated([up], startX(random)-1) ++ repeated([left], startY(random)-1)
   ++repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
@@ -207,7 +207,7 @@ knight(6) = (1,-2)
 knight(7) = (-1,2)
 knight(8) = (-1,-2)
 
-initial(random) = (0,3,3,cmds(exercise),1,[firstCrumb])
+initial(random) = (0,startX(random),startY(random),cmds(exercise),1,[firstCrumb])
   where
     firstCrumb = (1,startX(random),startY(random))
     cmds(1)     = robot_plan_ex1
