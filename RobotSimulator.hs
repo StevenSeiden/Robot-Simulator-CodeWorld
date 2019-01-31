@@ -25,7 +25,7 @@ pause = (0,0)
 -- Exercise 2: Add a parameter to make the simulation run faster or slower
 -------------------------------------------------------------------------------
 
-simulation_speed = 3 -- Change this number for testing exercise 2
+simulation_speed = 7 -- Change this number for testing exercise 2
 
 -------------------------------------------------------------------------------
 -- Exercise 3: Make the robot visit all the cells in the board
@@ -110,10 +110,13 @@ startX(random) = 3 --truncation(1 + random#1 * numCells)
 startY(random) = 3 --truncation(1 + random#2 * numCells)
 
 robot_plan_ex8(random) = repeated([up], startX(random)-1) ++ repeated([left], startY(random)-1)
-  ++repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
+  ++repeated(visit_all_right((numCells-1)) ++ [down] ++ visit_all_left((numCells-1)) ++
+    [down],4) ++ visit_all_right((numCells-1)) ++ 
+    if remainder(numCells,2) == 0 then [down] ++ visit_all_left((numCells-1))
+    else []
   where
-  visit_all_left(num) = repeated([left], num) ++ [down]
-  visit_all_right(num) = repeated([right], num) ++ [down]
+  visit_all_left(num) = repeated([left], num)
+  visit_all_right(num) = repeated([right], num)
 
 
 -------------------------------------------------------------------------------
