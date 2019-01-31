@@ -43,21 +43,21 @@ for file in "$@"; do
         fi
     if [ -z "$errormsg" ] || [[ $errormsg == *"warning"* ]]; then
         durl="${url}run.html?mode=$mode&dhash=$dhash"
-        echo -e "\e[92mSuccessfully uploaded files!\e[0m"
+        echo -e "\033[1;33;92mSuccessfully uploaded files!\e[0m"
         echo "Source at: $curl"
         echo "Runnable at: $durl"
         if [ ! -z "$errormsg" ]; then 
-            echo -e "\e[33mCompiled with warnings:"
+            echo -e "\033[1;33;4mCompiled with warnings:"
             echo ${errormsg}
-            echo -e "\e[0m"
         fi
         if [ ! -z "${DISPLAY}" ]; then
             open $durl &
         fi
+        echo -e "\e[0m"
         echo
     else
         echo
-        echo -e "\e[91m${file} Compilation failed:"
+        echo -e "\033[1;31;4m${file} Compilation failed:"
         echo ${errormsg}
         echo -e "\e[0m"
         echo "Source at: $curl"
