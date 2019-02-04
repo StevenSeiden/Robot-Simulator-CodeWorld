@@ -1,4 +1,3 @@
-import Extras((<$>))
 
 -------------------------------------------------------------------------------
 -- Global configuration values
@@ -6,13 +5,13 @@ import Extras((<$>))
 
 theGrid = newGrid(numCells, (-10, 10), (10,-10))
   where
-  numCells = 15
+  numCells = 5
 
 theCheckerboard = checkerboard(theGrid)
 
 place = placedInBoard(theGrid)
 
-exercise = 8 -- Change it to another number to test the corresponding exercise
+exercise = 9 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -25,7 +24,7 @@ pause = (0,0)
 -- Exercise 2: Add a parameter to make the simulation run faster or slower
 -------------------------------------------------------------------------------
 
-simulation_speed = 7 -- Change this number for testing exercise 2
+simulation_speed = 5 -- Change this number for testing exercise 2
 
 -------------------------------------------------------------------------------
 -- Exercise 3: Make the robot visit all the cells in the board
@@ -134,6 +133,14 @@ robot_plan_ex8(random) =
 -- Exercise 9: Make the robot move like a chess knight and then plan a path
 --             that covers all the cells with such moves
 -------------------------------------------------------------------------------
+robot_plan_ex9 = 
+   [knight5
+   ,knight3
+   ,knight8
+   ,knight6
+   ,knight2
+   ]
+
 
 -------------------------------------------------------------------------------
 -- Exercise 10: Add 5 or more obstacles to the grid and replan the paths,
@@ -236,14 +243,14 @@ up = (-1,0)
 left = (0,-1)
 right = (0,1)
 
-knight(1) = (2,1)
-knight(2) = (2,-1)
-knight(3) = (-2,1)
-knight(4) = (-2,-1)
-knight(5) = (1,2)
-knight(6) = (1,-2)
-knight(7) = (-1,2)
-knight(8) = (-1,-2)
+knight1 = (2,1)
+knight2 = (2,-1)
+knight3 = (-2,1)
+knight4 = (-2,-1)
+knight5 = (1,2)
+knight6 = (1,-2)
+knight7 = (-1,2)
+knight8 = (-1,-2)
 
 startX(random) = 3 --truncation(1 + random#1 * theGrid.#cells)
 startY(random) = 3 --truncation(1 + random#2 * theGrid.#cells)
@@ -270,6 +277,7 @@ initial(random) = State
     cmds(4)     = robot_plan_ex4
     cmds(5)     = robot_plan_ex5
     cmds(8)     = robot_plan_ex8(random)
+    cmds(9)		= robot_plan_ex9
     cmds(other) = robot_plan_ex0  -- plan 0 is provided as an example
 
 -------------------------------------------------------------------------------
