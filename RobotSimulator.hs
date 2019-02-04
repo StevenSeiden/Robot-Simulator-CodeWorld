@@ -1,16 +1,16 @@
 import Extras((<$>))
 
 -------------------------------------------------------------------------------
--- Before proceeding, read all the comments below and pay attention to them
--- In particular, notice a comment that contains the following sentence:
---                  "DO NOT MODIFY ANYTHING BELOW THIS LINE"
--- 
--- Read the rest of that comment carefully and make sure you understand it.
+-- Global configuration values
 -------------------------------------------------------------------------------
 
+theGrid = newGrid(numCells, (-10, 10), (10,-10))
+  where
+  numCells = 10
 
+theCheckerboard = checkerboard(theGrid)
 
-
+place = placedInBoard(theGrid)
 
 exercise = 8 -- Change it to another number to test the corresponding exercise
 
@@ -41,20 +41,24 @@ robot_plan_ex3 = repeated(visit_all_right(9) ++ visit_all_left(9),5) ++ [up]
 --             Note: simple transformations of the previous plan do not count
 --                   as new plans
 -------------------------------------------------------------------------------
-robot_plan_ex4 = iterateNums((numCells-1))
-
-              --  ++ right_down(2) ++ visit_all_left(1)
+robot_plan_ex4 = iterateNums((theGrid.#cells-1))
+                 --  ++ right_down(2) ++ visit_all_left(1)
   where
-  visit_all_left(num) = repeated([left], num)
+  visit_all_left(num)  = repeated([left], num)
   visit_all_right(num) = repeated([right], num)
-  visit_all_up(num) = repeated([up], num)
-  visit_all_down(num) = repeated([down], num)
+  visit_all_up(num)    = repeated([up], num)
+  visit_all_down(num)  = repeated([down], num)
   right_down(num) = (visit_all_right(num) ++ visit_all_down(num))
-  left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1)) 
+  left_up(num)    = (visit_all_left(num) ++ visit_all_up(num-1)) 
+  
   iterateNums :: Number -> [(Number,Number)]
   iterateNums(runAmount) =
      if runAmount <= 0 then [pause]
-     else right_down(runAmount)++ left_up(runAmount) ++ [right] ++ iterateNums(runAmount-2)
+     else right_down(runAmount)
+          ++ left_up(runAmount)
+          ++ [right]
+          ++ iterateNums(runAmount-2)
+          
 -------------------------------------------------------------------------------
 -- Exercise 5: Make everything work in a board of arbitrary size
 --             The board needs to be fit to the size of the output
@@ -63,28 +67,31 @@ robot_plan_ex4 = iterateNums((numCells-1))
 --             Also, change your plan3 and plan4 to depend on numCells
 -------------------------------------------------------------------------------
 
-numCells = 10 -- When you change this number, everything should still work
-
-robot_plan_ex5 = cover_all(numCells)
+robot_plan_ex5 = cover_all(theGrid.#cells)
   where
-  visit_all_left(num) = repeated([left], num)
+  visit_all_left(num)  = repeated([left], num)
   visit_all_right(num) = repeated([right], num)
-  visit_all_up(num) = repeated([up], num)
-  visit_all_down(num) = repeated([down], num)
+  visit_all_up(num)    = repeated([up], num)
+  visit_all_down(num)  = repeated([down], num)
   right_down(num) = (visit_all_right(num) ++ visit_all_down(num-1))
-  left_up(num) = (visit_all_left(num) ++ visit_all_up(num-1))
-  cover_all(num) = if num == 1 then [pause] else
-    visit_all_right(num-1) ++ visit_all_down(num-1)
-    ++ left_up(num-1) ++ iterateNums((numCells-2))
-     where
-     iterateNums :: Number -> [(Number,Number)]
-     iterateNums(runAmount) =
-       if runAmount <= 2 then
-       if runAmount == 1 then [right]
-       else if runAmount == 2 then [right, right, down, left]
-       else [pause]
-     else right_down(runAmount) ++
-       left_up(runAmount-1) ++ iterateNums(runAmount-2)
+  left_up(num)    = (visit_all_left(num)  ++ visit_all_up(num-1))
+  
+  cover_all(num) = 
+    if num == 1 then [pause]
+    else
+      visit_all_right(num-1)
+      ++ visit_all_down(num-1)
+      ++ left_up(num-1)
+      ++ iterateNums((theGrid.#cells-2))
+
+  iterateNums :: Number -> [(Number,Number)]
+  iterateNums(runAmount)
+    | runAmount == 0 = [pause]
+    | runAmount == 1 = [right]
+    | runAmount == 2 = [right, right, down, left]
+    | otherwise = right_down(runAmount)
+                  ++ left_up(runAmount-1)
+                  ++ iterateNums(runAmount-2)
 
   
 -------------------------------------------------------------------------------
@@ -106,15 +113,19 @@ robotPath = False
 --             You may need to modify the state to account for randomness
 -------------------------------------------------------------------------------
 
-startX(random) = 3 --truncation(1 + random#1 * numCells)
-startY(random) = 3 --truncation(1 + random#2 * numCells)
-
-robot_plan_ex8(random) = repeated([up], startX(random)-1) ++ repeated([left], startY(random)-1)
-  ++repeated(visit_all_right((numCells-1)) ++ [down] ++ visit_all_left((numCells-1)) ++
-    [down],4) ++ visit_all_right((numCells-1)) ++ 
-    if remainder(numCells,2) == 0 then [down] ++ visit_all_left((numCells-1))
-    else []
+robot_plan_ex8(random) =
+  repeated([up], startX(random)-1)
+  ++ repeated([left], startY(random)-1)
+  ++ repeated(visit_all_right((numCells-1))
+  ++ [down]
+  ++ visit_all_left((numCells-1))
+  ++ [down],4)
+  ++ visit_all_right((numCells-1))
+  ++ if remainder(numCells,2) == 0 
+     then [down] ++ visit_all_left((numCells-1))
+     else []
   where
+  numCells = theGrid.#cells
   visit_all_left(num) = repeated([left], num)
   visit_all_right(num) = repeated([right], num)
 
@@ -146,55 +157,78 @@ robot_plan_ex8(random) = repeated([up], startX(random)-1) ++ repeated([left], st
 -------------------------------------------------------------------------------
 
 
+
+
+
 -------------------------------------------------------------------------------
--- Modify update and draw to comply with the requirements above
+-- State, update and draw
 -------------------------------------------------------------------------------
--- t - time
--- i - row position
--- j - column position
--- cmds - commands 
--- n - step #
--- hs - list of crumbs and position
--- crumb - (n,i,j)
-update((t,i,j,[],n,hs),dt) = (t+dt,i,j,[],n,hs)
 
-update((t, i, j, cmds, n, hs), dt) =
-  if t*simulation_speed < 1 then (t+dt, i, j, cmds, n, hs)
-  else (0, i+ci, j+cj, cmds', n+1, (n+1,i+ci,j+cj):hs)
+data State = State
+  { elapsed :: Number
+  , rowPos :: Number
+  , colPos :: Number
+  , commands :: [Command]
+  , step :: Number
+  , crumbs :: [Crumb]
+  }
+  
+type Command = (Number,Number)
+type Crumb = (Number,Number,Number)
+
+update :: (State,Number) -> State
+update(state,dt)
+  | empty(state.#commands) = state
+  | simulation_speed * state.#elapsed < 1 = state 
+                                              { elapsed = state.#elapsed + dt }
+  | otherwise = State
+                  { elapsed = 0
+                  , rowPos = rowNew
+                  , colPos = colNew
+                  , commands = rest(state.#commands,1)
+                  , step = state.#step + 1
+                  , crumbs = (state.#step + 1,rowNew,colNew) : state.#crumbs
+                  }
   where
-    (ci,cj) = cmds#1
-    cmds' = rest(cmds,1)
+    rowNew = state.#rowPos + ci
+    colNew = state.#colPos + cj
+    (ci,cj) = state.#commands#1
 
-
-draw(t,i,j,cmds,n,hs) =
-  scaled(placedInBoard(cells,x0,x1,y0,y1,robot,newI,newJ),10/numCells,10/numCells)
-  & scaled(draw_crumbs(cells,x0,x1,y0,y1,hs,newI,newJ),10/numCells,10/numCells)
-  & scaled(checkerboard(cells,x0,x1,y0,y1),10/numCells,10/numCells)
+draw :: State -> Picture
+draw(state) =
+  scaled(place(robot,newI,newJ),10/numCells,10/numCells)
+  & scaled(draw_crumbs(state.#crumbs,newI,newJ),10/numCells,10/numCells)
+  & scaled(theCheckerboard,10/numCells,10/numCells)
   where
-    (ci,cj) = cmds#1
+    numCells = theGrid.#cells
+    (ci,cj) = state.#commands#1
+    i = state.#rowPos
+    j = state.#colPos
+    t = state.#elapsed
     newI = if smooth then i+ci*t else i
     newJ = if smooth then j+cj*t else j
-    (cells,x0,x1,y0,y1) = (numCells,-(numCells),numCells,numCells,-(numCells))
 
-draw_crumbs(cells,x0,x1,y0,y1,hs,newI,newJ) = if robotPath then
-  polyline[(midpoint(x0,w,j),midpoint(y0,h,i))| (n,i,j) <- (0,newI,newJ):hs]
-  else pictures([txt(n,midpoint(x0,w,j),midpoint(y0,h,i))
-           | (n,i,j) <- hs ])
+draw_crumbs(hs,newI,newJ) =
+  if robotPath
+  then
+    polyline([ ( midpoint(theGrid.#x0, theGrid.#gw, j)
+               , midpoint(theGrid.#y0, theGrid.#gh, i) )
+             | (n,i,j) <- (0,newI,newJ) : hs ])
+  else 
+    pictures([ txt(n, midpoint(theGrid.#x0, theGrid.#gw, j)
+                    , midpoint(theGrid.#y0, theGrid.#gh, i) )
+             | (n,i,j) <- hs ])
   where
     txt(n,x,y) = translated(scaled(text(printed(n)),0.5,0.5),x,y)
-    w = (x1-x0)/cells
-    h = (y1-y0)/cells
-
-robot_plan_ex0 =
-  repeated([right],9) ++ [down,down,left,up]
-  
-robot_plan_ex1 =
-  [right,right,right,pause,down,down,pause,pause,down,left,up,left,up,left]
-      
 
 main = interactionOf(initial,update,handle,draw)
 
+handle :: (State,Event) -> State
 handle(state,event) = state
+
+-------------------------------------------------------------------------------
+-- Commands and initial plans
+-------------------------------------------------------------------------------
 
 down = (1,0)
 up = (-1,0)
@@ -210,7 +244,24 @@ knight(6) = (1,-2)
 knight(7) = (-1,2)
 knight(8) = (-1,-2)
 
-initial(random) = (0,startX(random),startY(random),cmds(exercise),1,[firstCrumb])
+startX(random) = 3 --truncation(1 + random#1 * theGrid.#cells)
+startY(random) = 3 --truncation(1 + random#2 * theGrid.#cells)
+
+robot_plan_ex0 =
+  repeated([right],9) ++ [down,down,left,up]
+  
+robot_plan_ex1 =
+  [right,right,right,pause,down,down,pause,pause,down,left,up,left,up,left]
+      
+initial :: [Number] -> State
+initial(random) = State
+  { elapsed = 0
+  , rowPos = startX(random)
+  , colPos = startY(random)
+  , commands = cmds(exercise)
+  , step = 1
+  , crumbs = [firstCrumb]
+  }
   where
     firstCrumb = (1,startX(random),startY(random))
     cmds(1)     = robot_plan_ex1
@@ -220,33 +271,56 @@ initial(random) = (0,startX(random),startY(random),cmds(exercise),1,[firstCrumb]
     cmds(8)     = robot_plan_ex8(random)
     cmds(other) = robot_plan_ex0  -- plan 0 is provided as an example
 
+-------------------------------------------------------------------------------
+-- Grid
+-------------------------------------------------------------------------------
     
+data Grid = Grid
+  { cells :: Number
+  , x0 :: Number -- left
+  , y0 :: Number -- top
+  , x1 :: Number -- right
+  , y1 :: Number -- bottom
+  , gw :: Number -- width
+  , gh :: Number -- height
+  }
 
-{-| placedInBoard(n,x0,x1,y0,y1,pic,i,j) is a picture standing at cell (i,j)
-    in a checkerboard(n,x0,x1,y0,y1), where i is the row and j is the column
+newGrid :: (Number,Point,Point) -> Grid
+newGrid(n,(leftSide,top),(rightSide,bottom)) = Grid
+  { cells = n
+  , x0 = leftSide
+  , y0 = top
+  , x1 = rightSide
+  , y1 = bottom
+  , gw = (rightSide - leftSide) / n
+  , gh = (bottom - top) / n
+  }
+  
+{-| placedInBoard(grid)(pic,i,j) is a picture standing at cell (i,j)
+    in a checkerboard(grid), where i is the row and j is the column
     Rows and columns start at index 1. Rows go down and columns go right. |-}
-placedInBoard(n,x0,x1,y0,y1,pic,i,j) =
-  translated(pic,midpoint(x0,w,j),midpoint(y0,h,i))
-  where
-    w = (x1-x0)/n
-    h = (y1-y0)/n
+placedInBoard :: Grid -> (Picture,Number,Number) -> Picture
+placedInBoard(grid)(pic,i,j) =
+  translated(pic,midpoint(grid.#x0,grid.#gw,j),midpoint(grid.#y0,grid.#gh,i))
 
-{-| checkerboard(n,x0,x1,y0,y1) is a drawing of a checkerboard with
-    n rows and n columns, with top left corner at (x0,y0)
-    and bottom right corner at (x1,y1) |-}
-checkerboard :: (Number,Number,Number,Number,Number) -> Picture
-checkerboard(n,x0,x1,y0,y1) =
+checkerboard :: Grid -> Picture
+checkerboard(grid) =
   pictures
-  ([ colored(translated(solidRectangle(w,h),cx(j),cy(i)),color(i,j))
-   | i <- [1..n], j <- [1..n]
+  ([ colored(shifted(row,col),color(row,col))
+   | row <- [1..grid.#cells], col <- [1..grid.#cells]
    ])
   where
-    w = (x1-x0)/n
-    h = (y1-y0)/n
-    cx(i) = midpoint(x0,w,i)
-    cy(j) = midpoint(y0,h,j)
-    color(i,j) = [white,grey(0.8)] # (1 + remainder(i+j,2))
+    color(row,col) = [white,grey(0.8)] # (1 + remainder(row+col,2))
+    shifted(row,col) = translated(cell,by(grid.#y0, grid.#gh, col)
+                                      ,by(grid.#x0, grid.#gw, row) )
+      where
+      cell = solidRectangle(grid.#gw,grid.#gh)
+      by(start,len,units) = midpoint(start,len,units)
   
+-------------------------------------------------------------------------------
+-- Other
+-------------------------------------------------------------------------------
+
 {-|
     midpoint(x0,w,i) is the location of the midpoint of
     the i-th cell in a 1-dimensional grid anchored at x0, where each cell
@@ -264,3 +338,7 @@ robot =
           & solidRectangle(0.6,0.6),red)
   & translated(solidCircle(0.1),-0.2,-0.45)
   & translated(solidCircle(0.1),0.2,-0.45)
+
+-----------
+
+x .# f = f(x)
