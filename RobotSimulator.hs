@@ -171,8 +171,11 @@ data State = State
   , commands :: [Command]
   , step :: Number
   , crumbs :: [Crumb]
+  , obstacle :: Obstacle
   }
-  
+
+type Obstacle = Point
+
 type Command = (Number,Number)
 type Crumb = (Number,Number,Number)
 
@@ -194,11 +197,15 @@ update(state,dt)
     colNew = state.#colPos + cj
     (ci,cj) = state.#commands#1
 
+
 draw :: State -> Picture
 draw(state) = place(robot,newI,newJ)
+            & place(solidRectangle(1,1),yPos,xPos)
             & draw_crumbs(state.#crumbs,newI,newJ)
             & theCheckerboard
+
   where
+    (yPos,xPos) = state.#obstacle
     (ci,cj) = state.#commands#1
     i = state.#rowPos
     j = state.#colPos
@@ -262,6 +269,7 @@ initial(random) = State
   , commands = cmds(exercise)
   , step = 1
   , crumbs = [firstCrumb]
+  , obstacle = (4,3)
   }
   where
     firstCrumb = (1,startX(random),startY(random))
