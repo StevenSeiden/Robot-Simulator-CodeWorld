@@ -6,7 +6,7 @@ import Extras((<$>))
 
 theGrid = newGrid(numCells, (-10, 10), (10,-10))
   where
-  numCells = 10
+  numCells = 15
 
 theCheckerboard = checkerboard(theGrid)
 
@@ -195,12 +195,10 @@ update(state,dt)
     (ci,cj) = state.#commands#1
 
 draw :: State -> Picture
-draw(state) =
-  scaled(place(robot,newI,newJ),10/numCells,10/numCells)
-  & scaled(draw_crumbs(state.#crumbs,newI,newJ),10/numCells,10/numCells)
-  & scaled(theCheckerboard,10/numCells,10/numCells)
+draw(state) = place(robot,newI,newJ)
+            & draw_crumbs(state.#crumbs,newI,newJ)
+            & theCheckerboard
   where
-    numCells = theGrid.#cells
     (ci,cj) = state.#commands#1
     i = state.#rowPos
     j = state.#colPos
@@ -219,7 +217,10 @@ draw_crumbs(hs,newI,newJ) =
                     , midpoint(theGrid.#y0, theGrid.#gh, i) )
              | (n,i,j) <- hs ])
   where
-    txt(n,x,y) = translated(scaled(text(printed(n)),0.5,0.5),x,y)
+    scale = 5 / theGrid.#cells
+    txt(n,x,y) = translated(scaled(label,scale,scale),x,y)
+      where
+      label = text(printed(n))
 
 main = interactionOf(initial,update,handle,draw)
 
@@ -301,8 +302,11 @@ newGrid(n,(leftSide,top),(rightSide,bottom)) = Grid
     Rows and columns start at index 1. Rows go down and columns go right. |-}
 placedInBoard :: Grid -> (Picture,Number,Number) -> Picture
 placedInBoard(grid)(pic,i,j) =
-  translated(pic,midpoint(grid.#x0,grid.#gw,j),midpoint(grid.#y0,grid.#gh,i))
-
+  translated(pic',midpoint(grid.#x0,grid.#gw,j),midpoint(grid.#y0,grid.#gh,i))
+  where
+  pic' = scaled(pic,s,s)
+  s = 10 / grid.#cells
+  
 checkerboard :: Grid -> Picture
 checkerboard(grid) =
   pictures
