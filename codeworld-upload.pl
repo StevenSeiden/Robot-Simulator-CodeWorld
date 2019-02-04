@@ -22,7 +22,7 @@ if ($errormsg eq "" or index($errormsg, "error") == -1) {
     print color("green");
     print("Successfully uploaded files!\n");
     print color("reset");
-    print("Source at: $curl");
+    print("Source at: $curl\n");
     print("Runnable at: $durl\n");
 
     if ($errormsg ne "") {
