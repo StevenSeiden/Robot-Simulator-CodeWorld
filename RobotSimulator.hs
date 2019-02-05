@@ -191,7 +191,8 @@ update(state,dt)
   | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
-  | otherwise = State
+  | (rowNew,colNew) == (xPos,yPos) = state{ commands = [up, ]}
+  | otherwise = state
                   { elapsed = 0
                   , rowPos = rowNew
                   , colPos = colNew
@@ -203,11 +204,12 @@ update(state,dt)
     rowNew = state.#rowPos + ci
     colNew = state.#colPos + cj
     (ci,cj) = state.#commands#1
+    (yPos,xPos) = state.#obstacle
 
 
 draw :: State -> Picture
 draw(state) = place(robot,newI,newJ)
-            & place(solidRectangle(1,1),yPos,xPos)
+            & (if(exercise /= 9) then place(solidRectangle(1,1),yPos,xPos) else blank)
             & draw_crumbs(state.#crumbs,newI,newJ)
             & theCheckerboard
 
