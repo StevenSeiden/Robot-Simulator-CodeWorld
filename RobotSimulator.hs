@@ -104,7 +104,7 @@ smooth = False -- Use this parameter to control smoothness
 --             it is easy to see the trayectory it follows
 -------------------------------------------------------------------------------
 
-robotPath = False
+robotPath = True
 
 -------------------------------------------------------------------------------
 -- Exercise 8: Add a plan, like in Exercise 4, so that the robot can start 
@@ -135,10 +135,24 @@ robot_plan_ex8(random) =
 -------------------------------------------------------------------------------
 robot_plan_ex9 = 
    [knight(7)
-   ,knight(4)
-   ,knight(3)
+   ,knight(8)
+   ,knight(6)
    ,knight(1)
-   
+   ,knight(5)
+   ,knight(3)
+   ,knight(4)
+   ,knight(6)
+   ,knight(2)
+   ,knight(5)
+   ,knight(7)
+   ,knight(4)
+   ,knight(8)
+   ,knight(2)
+   ,knight(1)
+   ,knight(7)
+   ,knight(4)
+   ,knight(7)
+   --,knight(2)
    ]
 
 
