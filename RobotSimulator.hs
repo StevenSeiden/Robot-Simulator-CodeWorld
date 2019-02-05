@@ -134,11 +134,11 @@ robot_plan_ex8(random) =
 --             that covers all the cells with such moves
 -------------------------------------------------------------------------------
 robot_plan_ex9 = 
-   [knight5
-   ,knight3
-   ,knight8
-   ,knight6
-   ,knight2
+   [knight(7)
+   ,knight(4)
+   ,knight(3)
+   ,knight(1)
+   
    ]
 
 
@@ -250,14 +250,14 @@ up = (-1,0)
 left = (0,-1)
 right = (0,1)
 
-knight1 = (2,1)
-knight2 = (2,-1)
-knight3 = (-2,1)
-knight4 = (-2,-1)
-knight5 = (1,2)
-knight6 = (1,-2)
-knight7 = (-1,2)
-knight8 = (-1,-2)
+knight(1) = (2,1)
+knight(2) = (2,-1)
+knight(3) = (-2,1)
+knight(4) = (-2,-1)
+knight(5) = (1,2)
+knight(6) = (1,-2)
+knight(7) = (-1,2)
+knight(8) = (-1,-2)
 
 startX(random) = 3 --truncation(1 + random#1 * theGrid.#cells)
 startY(random) = 3 --truncation(1 + random#2 * theGrid.#cells)
