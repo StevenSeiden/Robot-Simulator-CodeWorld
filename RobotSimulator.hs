@@ -5,13 +5,13 @@
 
 theGrid = newGrid(numCells, (-10, 10), (10,-10))
   where
-  numCells = 5
+  numCells = 10
 
 theCheckerboard = checkerboard(theGrid)
 
 place = placedInBoard(theGrid)
 
-exercise = 9 -- Change it to another number to test the corresponding exercise
+exercise = 3 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -205,7 +205,7 @@ update(state,dt)
   | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
-  | (rowNew,colNew) == (xPos,yPos) = state{ commands = [up]}
+  | (rowNew,colNew) == (rPos,cPos) = state{commands = ([(colDir,rowDir),(rowDir,colDir),(rowDir,colDir),(-colDir,-rowDir)] ++ rest(state.#commands,1))}
   | otherwise = state
                   { elapsed = 0
                   , rowPos = rowNew
@@ -218,7 +218,9 @@ update(state,dt)
     rowNew = state.#rowPos + ci
     colNew = state.#colPos + cj
     (ci,cj) = state.#commands#1
-    (yPos,xPos) = state.#obstacle
+    (rPos,cPos) = state.#obstacle
+    rowDir = (rowNew-state.#rowPos)
+    colDir = (colNew-state.#colPos)
 
 
 draw :: State -> Picture
@@ -275,8 +277,8 @@ knight(6) = (1,-2)
 knight(7) = (-1,2)
 knight(8) = (-1,-2)
 
-startX(random) = 3 --truncation(1 + random#1 * theGrid.#cells)
-startY(random) = 3 --truncation(1 + random#2 * theGrid.#cells)
+startX(random) = 1 --truncation(1 + random#1 * theGrid.#cells)
+startY(random) = 1 --truncation(1 + random#2 * theGrid.#cells)
 
 robot_plan_ex0 =
   repeated([right],9) ++ [down,down,left,up]
@@ -292,7 +294,7 @@ initial(random) = State
   , commands = cmds(exercise)
   , step = 1
   , crumbs = [firstCrumb]
-  , obstacle = (4,3)
+  , obstacle = (1,10)
   }
   where
     firstCrumb = (1,startX(random),startY(random))
