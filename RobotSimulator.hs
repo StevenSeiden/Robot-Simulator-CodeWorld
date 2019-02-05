@@ -191,7 +191,7 @@ update(state,dt)
   | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
-  | (rowNew,colNew) == (xPos,yPos) = state{ commands = [up, ]}
+  | (rowNew,colNew) == (xPos,yPos) = state{ commands = [up]}
   | otherwise = state
                   { elapsed = 0
                   , rowPos = rowNew
