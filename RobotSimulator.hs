@@ -5,13 +5,18 @@
 
 theGrid = newGrid(numCells, (-10, 10), (10,-10))
   where
-  numCells = 5
+  numCells = 10
+
+
+startX(random) = 1 --truncation(1 + random#1 * theGrid.#cells)
+startY(random) = 1 --truncation(1 + random#2 * theGrid.#cells)
+
 
 theCheckerboard = checkerboard(theGrid)
 
 place = placedInBoard(theGrid)
 
-exercise = 9 -- Change it to another number to test the corresponding exercise
+exercise = 3 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -198,6 +203,7 @@ data State = State
   , step :: Number
   , crumbs :: [Crumb]
   , obstacle :: Obstacle
+  , secondMove :: (Number,Number)
   }
 
 type Obstacle = Point
@@ -210,21 +216,27 @@ update(state,dt)
   | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
-  | (rowNew,colNew) == (rPos,cPos) = state{commands = 
-  	([(colDir,rowDir),(rowDir,colDir),(rowDir,colDir),(-colDir,-rowDir)]
-  	 ++ rest(state.#commands,1))}
+  | (rowNew,colNew) ==(rPos,cPos) = state
+                                      {commands = ([(colDir,rowDir),(rowDir,colDir),
+                                                  (rowDir,colDir),(-colDir,-rowDir)]
+                                                  ++ rest(state.#commands,1))
+                                      }
   | otherwise = state
                   { elapsed = 0
                   , rowPos = rowNew
                   , colPos = colNew
                   , commands = rest(state.#commands,1)
                   , step = state.#step + 1
-                  , crumbs = (state.#step + 1,rowNew,colNew) : state.#crumbs
+                  , crumbs = (state.#step + 1,rowNew,colNew) : (state.#crumbs)
+                  , secondMove = (rowNew2nd, colNew2nd)
                   }
   where
     rowNew = state.#rowPos + ci
     colNew = state.#colPos + cj
+    rowNew2nd = rowNew + cii
+    colNew2nd = colNew + cjj
     (ci,cj) = state.#commands#1
+    (cii,cjj) = state.#commands#2
     (rPos,cPos) = state.#obstacle
     rowDir = (rowNew-state.#rowPos)
     colDir = (colNew-state.#colPos)
@@ -234,6 +246,7 @@ draw :: State -> Picture
 draw(state) = place(robot,newI,newJ)
             & (if(exercise /= 9) then place(solidRectangle(1,1),yPos,xPos) else blank)
             & draw_crumbs(state.#crumbs,newI,newJ)
+            & place(solidRectangle(1,1),rowNew2nd,colNew2nd)
             & theCheckerboard
 
   where
@@ -244,15 +257,17 @@ draw(state) = place(robot,newI,newJ)
     t = state.#elapsed
     newI = if smooth then i+ci*t else i
     newJ = if smooth then j+cj*t else j
+    (rowNew2nd,colNew2nd) = state.#secondMove
+
 
 draw_crumbs(hs,newI,newJ) =
   if robotPath
-  then
-    polyline([ ( midpoint(theGrid.#x0, theGrid.#gw, j)
+    then
+      polyline([ ( midpoint(theGrid.#x0, theGrid.#gw, j)
                , midpoint(theGrid.#y0, theGrid.#gh, i) )
              | (n,i,j) <- (0,newI,newJ) : hs ])
-  else 
-    pictures([ txt(n, midpoint(theGrid.#x0, theGrid.#gw, j)
+    else 
+      pictures([ txt(n, midpoint(theGrid.#x0, theGrid.#gw, j)
                     , midpoint(theGrid.#y0, theGrid.#gh, i) )
              | (n,i,j) <- hs ])
   where
@@ -284,9 +299,6 @@ knight(6) = (1,-2)
 knight(7) = (-1,2)
 knight(8) = (-1,-2)
 
-startX(random) = 3 --truncation(1 + random#1 * theGrid.#cells)
-startY(random) = 3 --truncation(1 + random#2 * theGrid.#cells)
-
 robot_plan_ex0 =
   repeated([right],9) ++ [down,down,left,up]
   
@@ -302,6 +314,7 @@ initial(random) = State
   , step = 1
   , crumbs = [firstCrumb]
   , obstacle = (1,10)
+  , secondMove = (2,2)
   }
   where
     firstCrumb = (1,startX(random),startY(random))
@@ -310,7 +323,7 @@ initial(random) = State
     cmds(4)     = robot_plan_ex4
     cmds(5)     = robot_plan_ex5
     cmds(8)     = robot_plan_ex8(random)
-    cmds(9)		= robot_plan_ex9
+    cmds(9)     = robot_plan_ex9
     cmds(other) = robot_plan_ex0  -- plan 0 is provided as an example
 
 -------------------------------------------------------------------------------
