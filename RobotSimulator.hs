@@ -5,13 +5,13 @@
 
 theGrid = newGrid(numCells, (-10, 10), (10,-10))
   where
-  numCells = 10
+  numCells = 5
 
 theCheckerboard = checkerboard(theGrid)
 
 place = placedInBoard(theGrid)
 
-exercise = 3 -- Change it to another number to test the corresponding exercise
+exercise = 9 -- Change it to another number to test the corresponding exercise
 
 -------------------------------------------------------------------------------
 -- Exercise 1: Add a "pause" command for the robot
@@ -152,7 +152,12 @@ robot_plan_ex9 =
    ,knight(7)
    ,knight(4)
    ,knight(7)
-   --,knight(2)
+   ,knight(2)
+   ,knight(1)
+   ,knight(8)
+   ,knight(6)
+   ,knight(3)
+   ,knight(4)
    ]
 
 
@@ -205,7 +210,9 @@ update(state,dt)
   | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
-  | (rowNew,colNew) == (rPos,cPos) = state{commands = ([(colDir,rowDir),(rowDir,colDir),(rowDir,colDir),(-colDir,-rowDir)] ++ rest(state.#commands,1))}
+  | (rowNew,colNew) == (rPos,cPos) = state{commands = 
+  	([(colDir,rowDir),(rowDir,colDir),(rowDir,colDir),(-colDir,-rowDir)]
+  	 ++ rest(state.#commands,1))}
   | otherwise = state
                   { elapsed = 0
                   , rowPos = rowNew
@@ -277,8 +284,8 @@ knight(6) = (1,-2)
 knight(7) = (-1,2)
 knight(8) = (-1,-2)
 
-startX(random) = 1 --truncation(1 + random#1 * theGrid.#cells)
-startY(random) = 1 --truncation(1 + random#2 * theGrid.#cells)
+startX(random) = 3 --truncation(1 + random#1 * theGrid.#cells)
+startY(random) = 3 --truncation(1 + random#2 * theGrid.#cells)
 
 robot_plan_ex0 =
   repeated([right],9) ++ [down,down,left,up]
