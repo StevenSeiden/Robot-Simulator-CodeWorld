@@ -4,8 +4,8 @@
 -------------------------------------------------------------------------------
 
 theGrid = newGrid(numCells, (-10, 10), (10,-10))
-  where
-  numCells = 10
+
+numCells = 10
 
 
 startX(random) = 1 --truncation(1 + random#1 * theGrid.#cells)
@@ -204,6 +204,7 @@ data State = State
   , crumbs :: [Crumb]
   , obstacle :: Obstacle
   , secondMove :: (Number,Number)
+  , direction :: (Number,Number)
   }
 
 type Obstacle = Point
@@ -216,6 +217,8 @@ update(state,dt)
   | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
+  | state.#colPos - numCells == 0 = state{ direction = reverseDirection(state.#direction)}
+  |state.#colPos - numCells == 0 = state{ direction = reverseDirection(state.#direction)}
   | (rowNew,colNew) ==(rPos,cPos) = state
                                       {commands = ([(colDir,rowDir),(rowDir,colDir),
                                                   (rowDir,colDir),(-colDir,-rowDir)]
@@ -241,6 +244,7 @@ update(state,dt)
     rowDir = (rowNew-state.#rowPos)
     colDir = (colNew-state.#colPos)
 
+reverseDirection(dirR, dirC) = (-dirR,-dirC)  
 
 draw :: State -> Picture
 draw(state) = place(robot,newI,newJ)
@@ -313,8 +317,9 @@ initial(random) = State
   , commands = cmds(exercise)
   , step = 1
   , crumbs = [firstCrumb]
-  , obstacle = (1,10)
+  , obstacle = (2,5)
   , secondMove = (2,2)
+  , direction = right
   }
   where
     firstCrumb = (1,startX(random),startY(random))
