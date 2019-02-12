@@ -120,16 +120,16 @@ robotPath = True
 robot_plan_ex8(random) =
   repeated([up], startX(random)-1)
   ++ repeated([left], startY(random)-1)
-  ++ repeated(visit_all_right((numCells-1))
+  ++ repeated(visit_all_right((numCells'-1))
   ++ [down]
-  ++ visit_all_left((numCells-1))
+  ++ visit_all_left((numCells'-1))
   ++ [down],4)
-  ++ visit_all_right((numCells-1))
-  ++ if remainder(numCells,2) == 0 
-     then [down] ++ visit_all_left((numCells-1))
+  ++ visit_all_right((numCells'-1))
+  ++ if remainder(numCells',2) == 0 
+     then [down] ++ visit_all_left((numCells'-1))
      else []
   where
-  numCells = theGrid.#cells
+  numCells' = theGrid.#cells
   visit_all_left(num) = repeated([left], num)
   visit_all_right(num) = repeated([right], num)
 
@@ -203,8 +203,8 @@ data State = State
   , step :: Number
   , crumbs :: [Crumb]
   , obstacle :: Obstacle
-  , secondMove :: (Number,Number)
-  , direction :: (Number,Number)
+  , command :: Command
+  , direction :: Command
   }
 
 type Obstacle = Point
@@ -217,13 +217,11 @@ update(state,dt)
   | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
-  | state.#colPos - numCells == 0 = state{ direction = reverseDirection(state.#direction)}
-  |state.#colPos - numCells == 0 = state{ direction = reverseDirection(state.#direction)}
-  | (rowNew,colNew) ==(rPos,cPos) = state
+  | state.#colPos - numCells == 0 = state{ command = reverseDirection(state.#direction)}
+  {-| (rowNew,colNew) ==(rPos,cPos) = state
                                       {commands = ([(colDir,rowDir),(rowDir,colDir),
                                                   (rowDir,colDir),(-colDir,-rowDir)]
-                                                  ++ rest(state.#commands,1))
-                                      }
+                                      }-}
   | otherwise = state
                   { elapsed = 0
                   , rowPos = rowNew
@@ -231,7 +229,8 @@ update(state,dt)
                   , commands = rest(state.#commands,1)
                   , step = state.#step + 1
                   , crumbs = (state.#step + 1,rowNew,colNew) : (state.#crumbs)
-                  , secondMove = (rowNew2nd, colNew2nd)
+                  --, command = (rowNew2nd, colNew2nd)
+                  , command = (rowNew, colNew)
                   }
   where
     rowNew = state.#rowPos + ci
@@ -261,7 +260,7 @@ draw(state) = place(robot,newI,newJ)
     t = state.#elapsed
     newI = if smooth then i+ci*t else i
     newJ = if smooth then j+cj*t else j
-    (rowNew2nd,colNew2nd) = state.#secondMove
+    (rowNew2nd,colNew2nd) = state.#command
 
 
 draw_crumbs(hs,newI,newJ) =
@@ -318,7 +317,7 @@ initial(random) = State
   , step = 1
   , crumbs = [firstCrumb]
   , obstacle = (2,5)
-  , secondMove = (2,2)
+  , command = right
   , direction = right
   }
   where
