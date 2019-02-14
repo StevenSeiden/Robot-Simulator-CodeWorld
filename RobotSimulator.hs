@@ -213,11 +213,12 @@ type Crumb = (Number,Number,Number)
 
 update :: (State,Number) -> State
 update(state,dt)
+  | (rowNew,colNew) ==(rPos,cPos) = state{command = (-2,-2)}
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
   | state.#rowPos == numCells  = state{ command = reverseCommand(state.#command)}
   {-| (rowNew,colNew) ==(rPos,cPos) = state
-                                      {commands = ([(colDir,rowDir),(rowDir,colDir),
+                                      {command = ([(colDir,rowDir),(rowDir,colDir),
                                                   (rowDir,colDir),(-colDir,-rowDir)]
                                       }-}
   | otherwise = state
@@ -239,6 +240,7 @@ update(state,dt)
     colNew2nd = colNew + cjj
     (ci,cj) = state.#commands#1
     (cii,cjj) = state.#commands#2
+    --obstacle positions are cPos and rPos
     (rPos,cPos) = state.#obstacle
     rowDir = (rowNew-state.#rowPos)
     colDir = (colNew-state.#colPos)
