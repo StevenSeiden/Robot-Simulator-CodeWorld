@@ -204,7 +204,6 @@ data State = State
   , crumbs :: [Crumb]
   , obstacle :: Obstacle
   , command :: Command
-  , direction :: Command
   }
 
 type Obstacle = Point
@@ -214,10 +213,9 @@ type Crumb = (Number,Number,Number)
 
 update :: (State,Number) -> State
 update(state,dt)
-  | empty(state.#commands) = state
   | simulation_speed * state.#elapsed < 1 = state 
                                               { elapsed = state.#elapsed + dt }
-  | state.#colPos - numCells == 0 = state{ command = reverseDirection(state.#direction)}
+  | state.#rowPos == numCells  = state{ command = reverseCommand(state.#command)}
   {-| (rowNew,colNew) ==(rPos,cPos) = state
                                       {commands = ([(colDir,rowDir),(rowDir,colDir),
                                                   (rowDir,colDir),(-colDir,-rowDir)]
@@ -232,6 +230,8 @@ update(state,dt)
                   --, command = (rowNew2nd, colNew2nd)
                   , command = (rowNew, colNew)
                   }
+  | empty(state.#commands) = state 
+
   where
     rowNew = state.#rowPos + ci
     colNew = state.#colPos + cj
@@ -243,13 +243,13 @@ update(state,dt)
     rowDir = (rowNew-state.#rowPos)
     colDir = (colNew-state.#colPos)
 
-reverseDirection(dirR, dirC) = (-dirR,-dirC)  
+reverseCommand(dirR, dirC) = (-dirR,-dirC)  
 
 draw :: State -> Picture
 draw(state) = place(robot,newI,newJ)
             & (if(exercise /= 9) then place(solidRectangle(1,1),yPos,xPos) else blank)
             & draw_crumbs(state.#crumbs,newI,newJ)
-            & place(solidRectangle(1,1),rowNew2nd,colNew2nd)
+            -- & place(solidRectangle(1,1),rowNew2nd,colNew2nd)
             & theCheckerboard
 
   where
@@ -318,7 +318,6 @@ initial(random) = State
   , crumbs = [firstCrumb]
   , obstacle = (2,5)
   , command = right
-  , direction = right
   }
   where
     firstCrumb = (1,startX(random),startY(random))
