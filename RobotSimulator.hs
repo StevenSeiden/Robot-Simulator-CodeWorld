@@ -199,7 +199,6 @@ data State = State
   { elapsed :: Number
   , rowPos :: Number
   , colPos :: Number
-  , commands :: [Command]
   , step :: Number
   , crumbs :: [Crumb]
   , obstacle :: Obstacle
@@ -213,9 +212,7 @@ type Crumb = (Number,Number,Number)
 
 update :: (State,Number) -> State
 update(state,dt)
-  | (rowNew,colNew) ==(rPos,cPos) = state{command = (-2,-2)}
-  | simulation_speed * state.#elapsed < 1 = state 
-                                              { elapsed = state.#elapsed + dt }
+  | simulation_speed * state.#elapsed < 1 = state{ elapsed = state.#elapsed + dt }
   | state.#rowPos == numCells  = state{ command = reverseCommand(state.#command)}
   {-| (rowNew,colNew) ==(rPos,cPos) = state
                                       {command = ([(colDir,rowDir),(rowDir,colDir),
@@ -225,21 +222,20 @@ update(state,dt)
                   { elapsed = 0
                   , rowPos = rowNew
                   , colPos = colNew
-                  , commands = rest(state.#commands,1)
                   , step = state.#step + 1
                   , crumbs = (state.#step + 1,rowNew,colNew) : (state.#crumbs)
                   --, command = (rowNew2nd, colNew2nd)
                   , command = (rowNew, colNew)
                   }
-  | empty(state.#commands) = state 
 
   where
     rowNew = state.#rowPos + ci
     colNew = state.#colPos + cj
     rowNew2nd = rowNew + cii
     colNew2nd = colNew + cjj
-    (ci,cj) = state.#commands#1
-    (cii,cjj) = state.#commands#2
+    (ci,cj) = if(state.#colPos == numCells) then down
+      else right
+    (cii,cjj) = state.#command
     --obstacle positions are cPos and rPos
     (rPos,cPos) = state.#obstacle
     rowDir = (rowNew-state.#rowPos)
@@ -256,7 +252,7 @@ draw(state) = place(robot,newI,newJ)
 
   where
     (yPos,xPos) = state.#obstacle
-    (ci,cj) = state.#commands#1
+    (ci,cj) = state.#command
     i = state.#rowPos
     j = state.#colPos
     t = state.#elapsed
@@ -315,7 +311,6 @@ initial(random) = State
   { elapsed = 0
   , rowPos = startX(random)
   , colPos = startY(random)
-  , commands = cmds(exercise)
   , step = 1
   , crumbs = [firstCrumb]
   , obstacle = (2,5)
