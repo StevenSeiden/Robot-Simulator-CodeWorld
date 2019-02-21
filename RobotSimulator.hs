@@ -29,7 +29,7 @@ pause = (0,0)
 -- Exercise 2: Add a parameter to make the simulation run faster or slower
 -------------------------------------------------------------------------------
 
-simulation_speed = 5 -- Change this number for testing exercise 2
+simulation_speed = 1 -- Change this number for testing exercise 2
 
 -------------------------------------------------------------------------------
 -- Exercise 3: Make the robot visit all the cells in the board
@@ -212,8 +212,16 @@ type Crumb = (Number,Number,Number)
 
 update :: (State,Number) -> State
 update(state,dt)
+  | remainder(numCells,2) == 1 && state.#rowPos == numCells && state.#colPos == numCells = state
+  | remainder(numCells,2) == 0 && state.#rowPos == numCells && state.#colPos == 1 = state
   | simulation_speed * state.#elapsed < 1 = state{ elapsed = state.#elapsed + dt }
-  | state.#rowPos == numCells  = state{ command = reverseCommand(state.#command)}
+  -- | state.#rowPos == numCells  = state{ rowPos = state.#rowPos - 1}
+  | remainder(state.#rowPos,2) == 0 = if state.#colPos == 1 then state{rowPos = state.#rowPos + 1} 
+                                      else state{colPos = state.#colPos-1 }
+  | remainder(state.#rowPos,2) /= 0 = if state.#colPos == numCells then state{rowPos = state.#rowPos + 1} 
+                                      else state{colPos = state.#colPos+1}
+  |otherwise = state
+
   {-| (rowNew,colNew) ==(rPos,cPos) = state
                                       {command = ([(colDir,rowDir),(rowDir,colDir),
                                                   (rowDir,colDir),(-colDir,-rowDir)]
@@ -264,7 +272,7 @@ draw(state) = place(robot,newI,newJ)
 draw_crumbs(hs,newI,newJ) =
   if robotPath
     then
-      polyline([ ( midpoint(theGrid.#x0, theGrid.#gw, j)
+    polyline([ ( midpoint(theGrid.#x0, theGrid.#gw, j)
                , midpoint(theGrid.#y0, theGrid.#gh, i) )
              | (n,i,j) <- (0,newI,newJ) : hs ])
     else 
