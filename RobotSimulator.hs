@@ -218,14 +218,31 @@ update(state,dt)
   -- | state.#rowPos == numCells  = state{ rowPos = state.#rowPos - 1}
   | remainder(state.#rowPos,2) == 0 = 
                                       if (rowNew,colNew) == (rPos,cPos+2) then state
-                                        {command = pause--([(colDir,rowDir),(rowDir,colDir),
+                                        {command = up--([(colDir,rowDir),(rowDir,colDir),
                                                   --(rowDir,colDir),(-colDir,-rowDir)]
+                                        }
+                                      else if (rowNew,colNew) == (rPos+1,cPos+2) then state
+                                        {command = right
+                                        }
+                                      else if (rowNew,colNew) == (rPos+2,cPos+2) then state
+                                        {command = right
+                                        }
+                                      else if (rowNew,colNew) == (rPos+3,cPos+2) then state
+                                        {command = down
                                         }
                                       else if state.#colPos == 1 then state{rowPos = state.#rowPos + 1} 
                                       else state{colPos = state.#colPos-1 }
   | remainder(state.#rowPos,2) /= 0 = if (rowNew,colNew) == (rPos,cPos) then state
-                                        {command = pause--([(colDir,rowDir),(rowDir,colDir),
-                                                  --(rowDir,colDir),(-colDir,-rowDir)]
+                                        {command = up
+                                        }
+                                        else if (rowNew+1,colNew) == (rPos,cPos) then state
+                                        {command = left
+                                        }
+                                        else if (rowNew,colNew) == (rPos,cPos+2) then state
+                                        {command = left
+                                        }
+                                        else if (rowNew,colNew) == (rPos,cPos+3) then state
+                                        {command = left
                                         }
                                       else if state.#colPos == numCells then state{rowPos = state.#rowPos + 1} 
                                       else state{colPos = state.#colPos+1}
