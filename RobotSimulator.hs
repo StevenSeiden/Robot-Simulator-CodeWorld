@@ -216,16 +216,22 @@ update(state,dt)
   | remainder(numCells,2) == 0 && state.#rowPos == numCells && state.#colPos == 1 = state
   | simulation_speed * state.#elapsed < 1 = state{ elapsed = state.#elapsed + dt }
   -- | state.#rowPos == numCells  = state{ rowPos = state.#rowPos - 1}
-  | remainder(state.#rowPos,2) == 0 = if state.#colPos == 1 then state{rowPos = state.#rowPos + 1} 
+  | remainder(state.#rowPos,2) == 0 = 
+                                      if (rowNew,colNew) == (rPos,cPos+2) then state
+                                        {command = pause--([(colDir,rowDir),(rowDir,colDir),
+                                                  --(rowDir,colDir),(-colDir,-rowDir)]
+                                        }
+                                      else if state.#colPos == 1 then state{rowPos = state.#rowPos + 1} 
                                       else state{colPos = state.#colPos-1 }
-  | remainder(state.#rowPos,2) /= 0 = if state.#colPos == numCells then state{rowPos = state.#rowPos + 1} 
+  | remainder(state.#rowPos,2) /= 0 = if (rowNew,colNew) == (rPos,cPos) then state
+                                        {command = pause--([(colDir,rowDir),(rowDir,colDir),
+                                                  --(rowDir,colDir),(-colDir,-rowDir)]
+                                        }
+                                      else if state.#colPos == numCells then state{rowPos = state.#rowPos + 1} 
                                       else state{colPos = state.#colPos+1}
   |otherwise = state
 
-  {-| (rowNew,colNew) ==(rPos,cPos) = state
-                                      {command = ([(colDir,rowDir),(rowDir,colDir),
-                                                  (rowDir,colDir),(-colDir,-rowDir)]
-                                      }-}
+  
   | otherwise = state
                   { elapsed = 0
                   , rowPos = rowNew
