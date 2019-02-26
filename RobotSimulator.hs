@@ -203,6 +203,7 @@ data State = State
   , crumbs :: [Crumb]
   , obstacle :: Obstacle
   , command :: Command
+  , isAvoiding :: Truth
   }
 
 type Obstacle = Point
@@ -215,51 +216,30 @@ update(state,dt)
   | remainder(numCells,2) == 1 && state.#rowPos == numCells && state.#colPos == numCells = state
   | remainder(numCells,2) == 0 && state.#rowPos == numCells && state.#colPos == 1 = state
   | simulation_speed * state.#elapsed < 1 = state{ elapsed = state.#elapsed + dt }
-  -- | state.#rowPos == numCells  = state{ rowPos = state.#rowPos - 1}
-  | remainder(state.#rowPos,2) == 0 = 
-                                      if (rowNew,colNew) == (rPos,cPos+2) then state
-                                        {command = up--([(colDir,rowDir),(rowDir,colDir),
-                                                  --(rowDir,colDir),(-colDir,-rowDir)]
-                                        }
-                                      else if (rowNew,colNew) == (rPos+1,cPos+2) then state
-                                        {command = right
-                                        }
-                                      else if (rowNew,colNew) == (rPos+2,cPos+2) then state
-                                        {command = right
-                                        }
-                                      else if (rowNew,colNew) == (rPos+3,cPos+2) then state
-                                        {command = down
-                                        }
-                                      else if state.#colPos == 1 then state{rowPos = state.#rowPos + 1} 
-                                      else state{colPos = state.#colPos-1 }
-  | remainder(state.#rowPos,2) /= 0 = if (rowNew,colNew) == (rPos,cPos) then state
-                                        {command = up
-                                        }
-                                        else if (rowNew+1,colNew) == (rPos,cPos) then state
-                                        {command = left
-                                        }
-                                        else if (rowNew,colNew) == (rPos,cPos+2) then state
-                                        {command = left
-                                        }
-                                        else if (rowNew,colNew) == (rPos,cPos+3) then state
-                                        {command = left
-                                        }
-                                      else if state.#colPos == numCells then state{rowPos = state.#rowPos + 1} 
-                                      else state{colPos = state.#colPos+1}
-  |otherwise = state
+  
+  | (rowNew,colNew) == (rPos,cPos+2*direction) && state.#isAvoiding /= True = state
+    {command = up,
+     isAvoiding = True
+    }
+  | (rowNew,colNew) == (rPos+1,cPos+2*direction) && state.#isAvoiding  = state
+    {command = (0,-direction)
+    }
+  | (rowNew,colNew) == (rPos+1,cPos-2*direction) && state.#isAvoiding  = state
+    {command = (0,-direction)
+    }
+  | (rowNew,colNew) == (rPos+1,cPos+2*direction) && state.#isAvoiding  = state
+    {command = down,
+     isAvoiding = False
+    }
 
   
-  | otherwise = state
-                  { elapsed = 0
-                  , rowPos = rowNew
-                  , colPos = colNew
-                  , step = state.#step + 1
-                  , crumbs = (state.#step + 1,rowNew,colNew) : (state.#crumbs)
-                  --, command = (rowNew2nd, colNew2nd)
-                  , command = (rowNew, colNew)
-                  }
+
+  
+  |otherwise = state{ command = (0,direction)}
 
   where
+    direction = if remainder(state.#rowPos,2) == 0 then -1 
+                else 1
     rowNew = state.#rowPos + ci
     colNew = state.#colPos + cj
     rowNew2nd = rowNew + cii
@@ -346,6 +326,7 @@ initial(random) = State
   , crumbs = [firstCrumb]
   , obstacle = (2,5)
   , command = right
+  , isAvoiding = False
   }
   where
     firstCrumb = (1,startX(random),startY(random))
