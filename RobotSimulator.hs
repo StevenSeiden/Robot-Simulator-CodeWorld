@@ -213,15 +213,21 @@ type Crumb = (Number,Number,Number)
 
 update :: (State,Number) -> State
 update(state,dt)
-  | direction == 1 && state.#rowPos == numCells && state.#colPos == numCells = state{rowPos = state.#rowPos+1}
-
-  | direction == -1 && state.#rowPos == numCells && state.#colPos == 1 = state{rowPos = state.#rowPos-1}
+    --End conditions--
+  | direction == 1 && state.#colPos == numCells && state.#rowPos == numCells =
+    state
+  | direction == -1 && state.#colPos == 1 && state.#rowPos == numCells =
+    state
+     --Speed--
   | simulation_speed * state.#elapsed < 1 = state{ elapsed = state.#elapsed + dt }
-  {-| state.#colPos == 1 && direction == -1 = state{rowPos = state.#rowPos - 1} 
-  | state.#colPos == numCells && direction == 1 = state{rowPos = state.#rowPos + 1} -}
+  --Edges--
+  | direction == 1 && state.#colPos == numCells = state{rowPos = state.#rowPos+1}
+  | direction == -1 && state.#colPos == 1 = state{rowPos = state.#rowPos+1}
   
-  | (rowNew,colNew) == (rPos,cPos+2*direction) && state.#isAvoiding /= True = state
-    {command = up,
+
+  --Avoidance--
+  {-| (rowNew,colNew) == (rPos,cPos+2*direction) && state.#isAvoiding /= True = state
+    {colPos = state.#colPos+direction,
      isAvoiding = True
     }
   | (rowNew,colNew) == (rPos+1,cPos+2*direction) && state.#isAvoiding  = state
@@ -231,9 +237,13 @@ update(state,dt)
     {colPos = state.#colPos-direction
     }
   | (rowNew,colNew) == (rPos+1,cPos+2*direction) && state.#isAvoiding  = state
-    {command = down,
+    {colPos = state.#colPos-direction,
      isAvoiding = False
-    }
+    }-}
+
+  
+
+  --Normal movements--
   | direction == -1 =
     state{colPos = state.#colPos-1}
 
