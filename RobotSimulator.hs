@@ -213,56 +213,47 @@ type Crumb = (Number,Number,Number)
 
 update :: (State,Number) -> State
 update(state,dt)
-    --End conditions--
+  --End conditions--
   | direction == 1 && state.#colPos == numCells && state.#rowPos == numCells =
     state
   | direction == -1 && state.#colPos == 1 && state.#rowPos == numCells =
     state
-     --Speed--
+  --Avoidance--
+  | (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) = state
+    {rowPos = state.#rowPos-1,
+     isAvoiding = True
+    }
+  | (state.#rowPos+1,state.#colPos-direction) == (obstacleR,obstacleC) && state.#isAvoiding == True = state
+    {colPos = state.#colPos-direction
+    }
+  | (state.#rowPos+1,state.#colPos) == (obstacleR,obstacleC) && state.#isAvoiding == True = state
+    {colPos = state.#colPos-direction
+    }
+  | (state.#rowPos+1,state.#colPos+direction) == (obstacleR,obstacleC) && state.#isAvoiding == True = state
+    {rowPos = state.#rowPos+1,
+     isAvoiding = False
+    }
+  --Speed--
   | simulation_speed * state.#elapsed < 1 = state{ elapsed = state.#elapsed + dt }
   --Edges--
   | direction == 1 && state.#colPos == numCells = state{rowPos = state.#rowPos+1}
   | direction == -1 && state.#colPos == 1 = state{rowPos = state.#rowPos+1}
   
-
-  --Avoidance--
-  {-| (rowNew,colNew) == (rPos,cPos+2*direction) && state.#isAvoiding /= True = state
-    {colPos = state.#colPos+direction,
-     isAvoiding = True
-    }
-  | (rowNew,colNew) == (rPos+1,cPos+2*direction) && state.#isAvoiding  = state
-    {colPos = state.#colPos-direction
-    }
-  | (rowNew,colNew) == (rPos+1,cPos-2*direction) && state.#isAvoiding  = state
-    {colPos = state.#colPos-direction
-    }
-  | (rowNew,colNew) == (rPos+1,cPos+2*direction) && state.#isAvoiding  = state
-    {colPos = state.#colPos-direction,
-     isAvoiding = False
-    }-}
-
-  
-
   --Normal movements--
-  | direction == -1 =
+  | direction == -1 && state.#isAvoiding == False =
     state{colPos = state.#colPos-1}
 
-  | otherwise = state{colPos = state.#colPos+1}
+  | direction == 1 && state.#isAvoiding == False =
+    state{colPos = state.#colPos+1}
+
+
+  | otherwise = state
 
   where
     direction = if remainder(state.#rowPos,2) == 0 then -1 
                 else 1
-    rowNew = state.#rowPos + ci
-    colNew = state.#colPos + cj
-    rowNew2nd = rowNew + cii
-    colNew2nd = colNew + cjj
-    (ci,cj) = if(state.#colPos == numCells) then down
-      else right
-    (cii,cjj) = state.#command
-    --obstacle positions are cPos and rPos
-    (rPos,cPos) = state.#obstacle
-    rowDir = (rowNew-state.#rowPos)
-    colDir = (colNew-state.#colPos)
+    --obstacle positions are obstacleC and obstacleR
+    (obstacleR,obstacleC) = state.#obstacle
 
 reverseCommand(dirR, dirC) = (-dirR,-dirC)  
 
@@ -336,7 +327,7 @@ initial(random) = State
   , colPos = startY(random)
   , step = 1
   , crumbs = [firstCrumb]
-  , obstacle = (2,5)
+  , obstacle = (3,5)
   , command = right
   , isAvoiding = False
   }
