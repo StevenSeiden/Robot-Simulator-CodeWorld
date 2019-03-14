@@ -201,7 +201,7 @@ data State = State
   , colPos :: Number
   , step :: Number
   , crumbs :: [Crumb]
-  , obstacle :: Obstacle
+  , obstacles :: [Obstacle]
   , command :: Command
   , isAvoiding :: Truth
   }
@@ -218,42 +218,47 @@ update(state,dt)
     state
   | direction == -1 && state.#colPos == 1 && state.#rowPos == numCells =
     state
-  --Avoidance--
-  | (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) = state
-    {rowPos = state.#rowPos-1,
-     isAvoiding = True
-    }
-  | (state.#rowPos+1,state.#colPos-direction) == (obstacleR,obstacleC) && state.#isAvoiding == True = state
-    {colPos = state.#colPos-direction
-    }
-  | (state.#rowPos+1,state.#colPos) == (obstacleR,obstacleC) && state.#isAvoiding == True = state
-    {colPos = state.#colPos-direction
-    }
-  | (state.#rowPos+1,state.#colPos+direction) == (obstacleR,obstacleC) && state.#isAvoiding == True = state
-    {rowPos = state.#rowPos+1,
-     isAvoiding = False
-    }
-  --Speed--
-  | simulation_speed * state.#elapsed < 1 = state{ elapsed = state.#elapsed + dt }
-  --Edges--
-  | direction == 1 && state.#colPos == numCells = state{rowPos = state.#rowPos+1}
-  | direction == -1 && state.#colPos == 1 = state{rowPos = state.#rowPos+1}
-  
-  --Normal movements--
-  | direction == -1 && state.#isAvoiding == False =
-    state{colPos = state.#colPos-1}
+  | otherwise = checkAllObs(state.#obstacles,1)
 
-  | direction == 1 && state.#isAvoiding == False =
-    state{colPos = state.#colPos+1}
-
-
-  | otherwise = state
 
   where
+    checkAllObs :: ([Obstacle],Number) -> State
+    checkAllObs(obstacles, count) =
+    --Avoidance--
+      if (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) then state
+        {rowPos = state.#rowPos-1,
+         isAvoiding = True
+        }
+      else if (state.#rowPos+1,state.#colPos-direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+        {colPos = state.#colPos-direction
+        }
+      else if (state.#rowPos+1,state.#colPos) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+        {colPos = state.#colPos-direction
+        }
+      else if (state.#rowPos+1,state.#colPos+direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+        {rowPos = state.#rowPos+1,
+         isAvoiding = False
+        }
+      --Speed--
+      else if simulation_speed * state.#elapsed < 1 then state{ elapsed = state.#elapsed + dt }
+      --Edges--
+      else if direction == 1 && state.#colPos == numCells then state{rowPos = state.#rowPos+1}
+      else if direction == -1 && state.#colPos == 1 then state{rowPos = state.#rowPos+1}
+      
+      --Normal movements--
+      else if direction == -1 && state.#isAvoiding == False then
+        state{colPos = state.#colPos-1}
+
+      else if direction == 1 && state.#isAvoiding == False then
+        state{colPos = state.#colPos+1}
+
+
+      else state
+
     direction = if remainder(state.#rowPos,2) == 0 then -1 
                 else 1
     --obstacle positions are obstacleC and obstacleR
-    (obstacleR,obstacleC) = state.#obstacle
+    (obstacleR,obstacleC) = state.#obstacles#1
 
 reverseCommand(dirR, dirC) = (-dirR,-dirC)  
 
@@ -265,7 +270,7 @@ draw(state) = place(robot,newI,newJ)
             & theCheckerboard
 
   where
-    (yPos,xPos) = state.#obstacle
+    (yPos,xPos) = state.#obstacles#1
     (ci,cj) = state.#command
     i = state.#rowPos
     j = state.#colPos
@@ -327,7 +332,7 @@ initial(random) = State
   , colPos = startY(random)
   , step = 1
   , crumbs = [firstCrumb]
-  , obstacle = (3,5)
+  , obstacles = [(3,5)]
   , command = right
   , isAvoiding = False
   }
