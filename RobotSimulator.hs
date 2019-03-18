@@ -225,35 +225,35 @@ update(state,dt)
     checkAllObs :: ([Obstacle],Number) -> State
     checkAllObs(obstacles, count) =
     --Avoidance--
-      if (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) then state
-        {rowPos = state.#rowPos-1,
-         isAvoiding = True
-        }
-      else if (state.#rowPos+1,state.#colPos-direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
-        {colPos = state.#colPos-direction
-        }
-      else if (state.#rowPos+1,state.#colPos) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
-        {colPos = state.#colPos-direction
-        }
-      else if (state.#rowPos+1,state.#colPos+direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
-        {rowPos = state.#rowPos+1,
-         isAvoiding = False
-        }
-      --Speed--
-      else if simulation_speed * state.#elapsed < 1 then state{ elapsed = state.#elapsed + dt }
-      --Edges--
-      else if direction == 1 && state.#colPos == numCells then state{rowPos = state.#rowPos+1}
-      else if direction == -1 && state.#colPos == 1 then state{rowPos = state.#rowPos+1}
-      
-      --Normal movements--
-      else if direction == -1 && state.#isAvoiding == False then
-        state{colPos = state.#colPos-1}
+      if count >= 1 then
+        if (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) then state
+          {rowPos = state.#rowPos-1,
+           isAvoiding = True
+          }
+        else if (state.#rowPos+1,state.#colPos-direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+          {colPos = state.#colPos-direction
+          }
+        else if (state.#rowPos+1,state.#colPos) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+          {colPos = state.#colPos-direction
+          }
+        else if (state.#rowPos+1,state.#colPos+direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+          {rowPos = state.#rowPos+1,
+           isAvoiding = False
+          }
+      else
+        --Speed--
+        if simulation_speed * state.#elapsed < 1 then state{ elapsed = state.#elapsed + dt }
+        --Edges--
+        else if direction == 1 && state.#colPos == numCells then state{rowPos = state.#rowPos+1}
+        else if direction == -1 && state.#colPos == 1 then state{rowPos = state.#rowPos+1}
+        
+        --Normal movements--
+        else if direction == -1 && state.#isAvoiding == False then
+          state{colPos = state.#colPos-1}
 
-      else if direction == 1 && state.#isAvoiding == False then
-        state{colPos = state.#colPos+1}
-
-
-      else state
+        else if direction == 1 && state.#isAvoiding == False then
+          state{colPos = state.#colPos+1}
+        else state
 
     direction = if remainder(state.#rowPos,2) == 0 then -1 
                 else 1
