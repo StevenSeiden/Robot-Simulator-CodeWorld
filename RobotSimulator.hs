@@ -1,4 +1,4 @@
-
+import Extras((<$>))
 -------------------------------------------------------------------------------
 -- Global configuration values
 -------------------------------------------------------------------------------
@@ -243,7 +243,7 @@ update(state,dt)
     state
   | direction == -1 && state.#colPos == 1 && state.#rowPos == numCells =
     state
-  | otherwise = checkAllObs(state.#obstacles,1)
+  | otherwise = checkAllObs(state.#obstacles,length(state.#obstacles))
 
 
   where
@@ -291,7 +291,7 @@ draw :: State -> Picture
 draw(state) = place(robot,i,j)
     & (
 	      if(exercise /= 9)
-	      then place(solidRectangle(1,1),yPos,xPos)
+	      then pictures(drawObs <$> state.#obstacles)
 	      else blank
       )
     -- & draw_crumbs(state.#crumbs,i,j)
@@ -299,12 +299,13 @@ draw(state) = place(robot,i,j)
     & theCheckerboard
 
   where
-    (yPos,xPos) = state.#obstacles#1
+    (rPos,cPos) = state.#obstacles#1
     (ci,cj) = state.#command
     i = state.#rowPos
     j = state.#colPos
     (rowNew2nd,colNew2nd) = state.#command
 
+drawObs(rPos,cPos) = place(solidRectangle(1,1),rPos,cPos)
 
 draw_crumbs(hs,newI,newJ) =
   if robotPath
@@ -357,7 +358,7 @@ initial(random) = State
   , colPos = startY(random)
   , step = 1
   , crumbs = [firstCrumb]
-  , obstacles = [(3,5)]
+  , obstacles = [(3,5),(5,3)]
   , command = right
   , isAvoiding = False
   }
