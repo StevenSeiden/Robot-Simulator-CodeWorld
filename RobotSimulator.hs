@@ -247,25 +247,27 @@ update(state,dt)
 
 
   where
+    direction = if remainder(state.#rowPos,2) == 0 then -1 
+                else 1
     checkAllObs :: ([Obstacle],Number) -> State
-    checkAllObs(obstacles, count) =
+    checkAllObs(obs, count) =
     --Avoidance--
       if count >= 1 then
-        (if (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) then state
+        (if (state.#rowPos,state.#colPos+direction) == currentObs then state
           {rowPos = state.#rowPos-1,
            isAvoiding = True
           }
-        else if (state.#rowPos+1,state.#colPos-direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+        else if (state.#rowPos+1,state.#colPos-direction) == currentObs && state.#isAvoiding == True then state
           {colPos = state.#colPos-direction
           }
-        else if (state.#rowPos+1,state.#colPos) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+        else if (state.#rowPos+1,state.#colPos) == currentObs && state.#isAvoiding == True then state
           {colPos = state.#colPos-direction
           }
-        else if (state.#rowPos+1,state.#colPos+direction) == (obstacleR,obstacleC) && state.#isAvoiding == True then state
+        else if (state.#rowPos+1,state.#colPos+direction) == currentObs && state.#isAvoiding == True then state
           {rowPos = state.#rowPos+1,
            isAvoiding = False
           }
-          else checkAllObs(obstacles,count-1))
+          else checkAllObs(obs,count-1))
       else(
         --Edges--
         if direction == 1 && state.#colPos == numCells then state{rowPos = state.#rowPos+1}
@@ -279,11 +281,9 @@ update(state,dt)
           state{colPos = state.#colPos+1}
         else state
         )
-
-    direction = if remainder(state.#rowPos,2) == 0 then -1 
-                else 1
-    --obstacle positions are obstacleC and obstacleR
-    (obstacleR,obstacleC) = state.#obstacles#1
+        where
+          currentObs = ((state.#obstacles)#count) 
+    
 
 reverseCommand(dirR, dirC) = (-dirR,-dirC)  
 
