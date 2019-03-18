@@ -226,7 +226,7 @@ update(state,dt)
     checkAllObs(obstacles, count) =
     --Avoidance--
       if count >= 1 then
-        if (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) then state
+        (if (state.#rowPos,state.#colPos+direction) == (obstacleR,obstacleC) then state
           {rowPos = state.#rowPos-1,
            isAvoiding = True
           }
@@ -240,8 +240,9 @@ update(state,dt)
           {rowPos = state.#rowPos+1,
            isAvoiding = False
           }
-      else
-        --Speed--
+          else checkAllObs(obstacles,count-1))
+      else(
+        --Speed
         if simulation_speed * state.#elapsed < 1 then state{ elapsed = state.#elapsed + dt }
         --Edges--
         else if direction == 1 && state.#colPos == numCells then state{rowPos = state.#rowPos+1}
@@ -254,6 +255,7 @@ update(state,dt)
         else if direction == 1 && state.#isAvoiding == False then
           state{colPos = state.#colPos+1}
         else state
+        )
 
     direction = if remainder(state.#rowPos,2) == 0 then -1 
                 else 1
