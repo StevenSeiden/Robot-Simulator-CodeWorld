@@ -29,7 +29,7 @@ pause = (0,0)
 -- Exercise 2: Add a parameter to make the simulation run faster or slower
 -------------------------------------------------------------------------------
 
-simulation_speed = 1 -- Change this number for testing exercise 2
+simulation_speed = 10 -- Change this number for testing exercise 2
 
 -------------------------------------------------------------------------------
 -- Exercise 3: Make the robot visit all the cells in the board
@@ -109,7 +109,7 @@ smooth = False -- Use this parameter to control smoothness
 --             it is easy to see the trayectory it follows
 -------------------------------------------------------------------------------
 
-robotPath = True
+robotPath = False
 
 -------------------------------------------------------------------------------
 -- Exercise 8: Add a plan, like in Exercise 4, so that the robot can start 
@@ -192,12 +192,37 @@ robot_plan_ex9 =
 
 
 -------------------------------------------------------------------------------
+-- Context, deal with speed
+-------------------------------------------------------------------------------
+
+data Context = Context
+  { elapsed :: Number
+  , cState :: State
+  }
+
+cInitial(rs) = Context
+  { elapsed = 0
+  , cState = initial(rs)
+  }
+
+cUpdate(ctx,dt)
+  | simulation_speed * ctx.#elapsed < 1
+              = ctx { elapsed = dt + ctx.#elapsed }
+      
+  | otherwise = ctx { elapsed = 0
+                    , cState = update(ctx.#cState,dt)
+		    }
+  
+cHandle(ctx,ev) = ctx { cState = handle(ctx.#cState,ev) }
+
+cDraw(ctx) = draw(ctx.#cState)
+
+-------------------------------------------------------------------------------
 -- State, update and draw
 -------------------------------------------------------------------------------
 
 data State = State
-  { elapsed :: Number
-  , rowPos :: Number
+  { rowPos :: Number
   , colPos :: Number
   , step :: Number
   , crumbs :: [Crumb]
@@ -242,10 +267,8 @@ update(state,dt)
           }
           else checkAllObs(obstacles,count-1))
       else(
-        --Speed
-        if simulation_speed * state.#elapsed < 1 then state{ elapsed = state.#elapsed + dt }
         --Edges--
-        else if direction == 1 && state.#colPos == numCells then state{rowPos = state.#rowPos+1}
+        if direction == 1 && state.#colPos == numCells then state{rowPos = state.#rowPos+1}
         else if direction == -1 && state.#colPos == 1 then state{rowPos = state.#rowPos+1}
         
         --Normal movements--
@@ -265,20 +288,21 @@ update(state,dt)
 reverseCommand(dirR, dirC) = (-dirR,-dirC)  
 
 draw :: State -> Picture
-draw(state) = place(robot,newI,newJ)
-            & (if(exercise /= 9) then place(solidRectangle(1,1),yPos,xPos) else blank)
-            & draw_crumbs(state.#crumbs,newI,newJ)
-            -- & place(solidRectangle(1,1),rowNew2nd,colNew2nd)
-            & theCheckerboard
+draw(state) = place(robot,i,j)
+    & (
+	      if(exercise /= 9)
+	      then place(solidRectangle(1,1),yPos,xPos)
+	      else blank
+      )
+    -- & draw_crumbs(state.#crumbs,i,j)
+    -- & place(solidRectangle(1,1),rowNew2nd,colNew2nd)
+    & theCheckerboard
 
   where
     (yPos,xPos) = state.#obstacles#1
     (ci,cj) = state.#command
     i = state.#rowPos
     j = state.#colPos
-    t = state.#elapsed
-    newI = if smooth then i+ci*t else i
-    newJ = if smooth then j+cj*t else j
     (rowNew2nd,colNew2nd) = state.#command
 
 
@@ -298,10 +322,10 @@ draw_crumbs(hs,newI,newJ) =
       where
       label = text(printed(n))
 
-main = interactionOf(initial,update,handle,draw)
-
 handle :: (State,Event) -> State
 handle(state,event) = state
+
+main = interactionOf(cInitial,cUpdate,cHandle,cDraw)
 
 -------------------------------------------------------------------------------
 -- Commands and initial plans
@@ -329,8 +353,7 @@ robot_plan_ex1 =
       
 initial :: [Number] -> State
 initial(random) = State
-  { elapsed = 0
-  , rowPos = startX(random)
+  { rowPos = startX(random)
   , colPos = startY(random)
   , step = 1
   , crumbs = [firstCrumb]
