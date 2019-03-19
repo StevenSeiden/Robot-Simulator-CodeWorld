@@ -264,8 +264,7 @@ update(state,dt)
           {colPos = state.#colPos-direction
           }
         else if (state.#rowPos+1,state.#colPos+direction) == currentObs && state.#isAvoiding == True then state
-          {rowPos = state.#rowPos+1,
-           isAvoiding = False
+          {rowPos = state.#rowPos+1
           }
           else checkAllObs(obs,count-1))
       else(
@@ -283,6 +282,11 @@ update(state,dt)
         )
         where
           currentObs = ((state.#obstacles)#count) 
+          checkForObs(position, count) =
+            if count >= 1 then
+              if (position == (state.#rowPos, state.#colPos)) then True
+              else checkForObs(position,count-1)
+            else False
     
 
 reverseCommand(dirR, dirC) = (-dirR,-dirC)  
@@ -358,7 +362,7 @@ initial(random) = State
   , colPos = startY(random)
   , step = 1
   , crumbs = [firstCrumb]
-  , obstacles = [(3,5),(5,3)]
+  , obstacles = [(5,5),(4,6),(4,5)]
   , command = right
   , isAvoiding = False
   }
